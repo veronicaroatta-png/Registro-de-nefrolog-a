@@ -117,6 +117,42 @@ function _initSessionTimeout() {
   _resetSessionTimer();
 }
 
+// ─── CIFRADO DE N° HC (AES-256-GCM + PBKDF2) ─────────────────────────────────
+let _cryptoKey = null;
+
+async function _deriveKey(password) {
+  const enc    = new TextEncoder();
+  const keyMat = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: enc.encode('nefro-hc-v1'), iterations: 100000, hash: 'SHA-256' },
+    keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+  );
+}
+
+async function encryptHC(hc) {
+  if (!hc || !_cryptoKey) return hc;
+  try {
+    const enc = new TextEncoder();
+    const iv  = crypto.getRandomValues(new Uint8Array(12));
+    const ct  = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, _cryptoKey, enc.encode(String(hc)));
+    const buf = new Uint8Array(12 + ct.byteLength);
+    buf.set(iv);
+    buf.set(new Uint8Array(ct), 12);
+    return btoa(String.fromCharCode(...buf));
+  } catch(e) { return hc; }
+}
+
+async function decryptHC(ciphertext) {
+  if (!ciphertext || !_cryptoKey) return '🔒';
+  try {
+    const buf = new Uint8Array(atob(ciphertext).split('').map(c => c.charCodeAt(0)));
+    const pt  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0,12) }, _cryptoKey, buf.slice(12));
+    return new TextDecoder().decode(pt);
+  } catch(e) { return '🔒'; }
+}
+
 // ─── AUTENTICACIÓN ────────────────────────────────────────────────────────────
 function getToken() { return sessionStorage.getItem('nefroToken') || ''; }
 function authHdr()  { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
@@ -154,6 +190,7 @@ async function intentarLogin() {
       return;
     }
     _rlReset();
+    _cryptoKey = await _deriveKey(pass);
     mostrarLogin(false);
     _initSessionTimeout();
     await renderTabla();
@@ -457,7 +494,7 @@ document.getElementById('main-form').addEventListener('submit', async function (
   }
 
   const registro = {
-    'N° HC':                 getVal('hc'),
+    'N° HC':                 await encryptHC(getVal('hc')),
     'Edad':                  getVal('edad'),
     'Sexo':                  getVal('sexo'),
     'Fecha':                 getVal('fecha'),
@@ -523,15 +560,21 @@ document.getElementById('main-form').addEventListener('submit', async function (
 // ─── TABLA ─────────────────────────────────────────────────────────────────
 async function renderTabla() {
   const db = await cargarDB();
-  document.getElementById('db-count').textContent = db.length + ' registro' + (db.length !== 1 ? 's' : '');
+  // Descifrar N° HC para mostrar en pantalla
+  const dbDisplay = await Promise.all(db.map(async row => {
+    const r = { ...row };
+    if (r['N° HC']) r['N° HC'] = await decryptHC(r['N° HC']);
+    return r;
+  }));
+  document.getElementById('db-count').textContent = dbDisplay.length + ' registro' + (dbDisplay.length !== 1 ? 's' : '');
   const wrap = document.getElementById('table-wrap');
-  if (!db.length) {
+  if (!dbDisplay.length) {
     wrap.innerHTML = '<div class="no-data">Aún no hay registros cargados.</div>';
     return;
   }
-  const cols = Object.keys(db[0]);
+  const cols = Object.keys(dbDisplay[0]);
   let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-  db.forEach(row => {
+  dbDisplay.forEach(row => {
     html += `<tr>${cols.map(c => `<td title="${row[c]}">${row[c] !== undefined ? row[c] : ''}</td>`).join('')}</tr>`;
   });
   html += '</tbody></table>';
@@ -542,10 +585,16 @@ async function renderTabla() {
 async function exportarExcel() {
   const db = await cargarDB();
   if (!db.length) { mostrarToast('No hay registros para exportar.', 'error'); return; }
-  const ws = XLSX.utils.json_to_sheet(db);
+  // Descifrar N° HC antes de exportar
+  const dbExport = await Promise.all(db.map(async row => {
+    const r = { ...row };
+    if (r['N° HC']) r['N° HC'] = await decryptHC(r['N° HC']);
+    return r;
+  }));
+  const ws = XLSX.utils.json_to_sheet(dbExport);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
-  ws['!cols'] = Object.keys(db[0]).map(k => ({ wch: Math.max(k.length, 12) }));
+  ws['!cols'] = Object.keys(dbExport[0]).map(k => ({ wch: Math.max(k.length, 12) }));
   XLSX.writeFile(wb, `registro_nefrologia_${new Date().toISOString().slice(0, 10)}.xlsx`);
   mostrarToast('📥 Excel exportado correctamente.', 'success');
 }
@@ -563,15 +612,23 @@ function importarExcel(event) {
 
       mostrarToast('Verificando duplicados...', '');
       const dbActual = await cargarDB();
+      // Descifrar HCs almacenados para poder comparar con los del Excel (texto plano)
+      const dbDesc = await Promise.all(dbActual.map(async r => ({
+        ...r, 'N° HC': await decryptHC(r['N° HC'])
+      })));
       const nuevos = rows.filter(row =>
-        !dbActual.some(r =>
-          r['N° HC'] === String(row['N° HC']) && r['Fecha'] === String(row['Fecha'])
+        !dbDesc.some(r =>
+          r['N° HC'] === String(row['N° HC']).trim() && r['Fecha'] === String(row['Fecha'])
         )
       );
       const duplicados = rows.length - nuevos.length;
 
       if (nuevos.length > 0) {
-        await agregarMultiples(nuevos);
+        // Cifrar HCs antes de guardar en Airtable
+        const nuevosEnc = await Promise.all(nuevos.map(async row => ({
+          ...row, 'N° HC': await encryptHC(String(row['N° HC']).trim())
+        })));
+        await agregarMultiples(nuevosEnc);
       }
 
       await renderTabla();
@@ -685,6 +742,10 @@ function autocargaDesdeJSON() {
   if (getToken()) {
     const r = await fetch(WORKER_URL, { headers: authHdr() }).catch(() => null);
     if (r && r.status !== 401) {
+      // Al recargar la página el token persiste pero la clave AES no.
+      // Pedimos la contraseña solo para reconstruir la clave de cifrado.
+      const pass2 = prompt('Ingresá tu contraseña para descifrar los N° HC:');
+      if (pass2) _cryptoKey = await _deriveKey(pass2);
       mostrarLogin(false);
       _initSessionTimeout();
       mostrarToast('Cargando registros desde Airtable...', '');
