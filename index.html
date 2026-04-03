@@ -560,25 +560,12 @@ document.getElementById('main-form').addEventListener('submit', async function (
 // ─── TABLA ─────────────────────────────────────────────────────────────────
 async function renderTabla() {
   const db = await cargarDB();
-  // Descifrar N° HC para mostrar en pantalla
-  const dbDisplay = await Promise.all(db.map(async row => {
-    const r = { ...row };
-    if (r['N° HC']) r['N° HC'] = await decryptHC(r['N° HC']);
-    return r;
-  }));
-  document.getElementById('db-count').textContent = dbDisplay.length + ' registro' + (dbDisplay.length !== 1 ? 's' : '');
+  const n = db.length;
+  document.getElementById('db-count').textContent = n + ' registro' + (n !== 1 ? 's' : '');
   const wrap = document.getElementById('table-wrap');
-  if (!dbDisplay.length) {
-    wrap.innerHTML = '<div class="no-data">Aún no hay registros cargados.</div>';
-    return;
-  }
-  const cols = Object.keys(dbDisplay[0]);
-  let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-  dbDisplay.forEach(row => {
-    html += `<tr>${cols.map(c => `<td title="${row[c]}">${row[c] !== undefined ? row[c] : ''}</td>`).join('')}</tr>`;
-  });
-  html += '</tbody></table>';
-  wrap.innerHTML = html;
+  wrap.innerHTML = n
+    ? `<div class="no-data" style="padding:24px; color:var(--muted);">🔒 ${n} registro${n !== 1 ? 's' : ''} almacenado${n !== 1 ? 's' : ''} de forma segura. Exportá a Excel para consultar los datos.</div>`
+    : '<div class="no-data">Aún no hay registros cargados.</div>';
 }
 
 // ─── EXPORTAR EXCEL ────────────────────────────────────────────────────────
