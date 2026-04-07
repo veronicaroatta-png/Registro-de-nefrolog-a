@@ -702,6 +702,7 @@ function autocargaDesdeJSON() {
   setVal('peso', d.peso); setVal('talla', d.talla); actualizarIMC();
   setVal('creatinina', d.creatinina); setVal('urea', d.urea);
   setVal('proteinuria', d.proteinuria); setVal('albuminuria', d.albuminuria);
+    setVal('hb', d.hb); setVal('potasio', d.k ?? d.potasio); setVal('pth', d.pth);
   actualizarFGe(); actualizarKFRE();
   if (d.biopsia !== undefined) {
     const bVal = d.biopsia === true || d.biopsia === 'Sí' ? 'Sí' : 'No';
