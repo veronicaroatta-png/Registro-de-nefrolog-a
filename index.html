@@ -701,7 +701,8 @@ function autocargaDesdeJSON() {
   if (d.edemas !== undefined) setRadio('edemas', d.edemas === true || d.edemas === 'Sí' ? 'Sí' : 'No');
   setVal('peso', d.peso); setVal('talla', d.talla); actualizarIMC();
   setVal('creatinina', d.creatinina); setVal('urea', d.urea);
-  setVal('proteinuria', d.proteinuria); setVal('albuminuria', d.albuminuria);
+ setVal('proteinuria', d.proteinuria); setVal('albuminuria', d.albuminuria);
+  setVal('hb', d.hb); setVal('potasio', d.k ?? d.potasio); setVal('pth', d.pth);
     setVal('hb', d.hb); setVal('potasio', d.k ?? d.potasio); setVal('pth', d.pth);
   actualizarFGe(); actualizarKFRE();
   if (d.biopsia !== undefined) {
