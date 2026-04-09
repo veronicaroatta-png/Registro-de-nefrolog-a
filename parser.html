@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parser de Historia Clínica — Registro Nefrológico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["DM Sans", "sans-serif"],
+            serif: ["DM Serif Display", "serif"],
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    body { font-family: "DM Sans", sans-serif; background: #f5f0e8; color: #1a1a2e; margin: 0; }
+    .font-serif { font-family: "DM Serif Display", serif; }
+    .field-val {
+      padding: 7px 10px; border: 1.5px solid #d5c9b8; border-radius: 3px;
+      background: white; font-size: 0.88rem; min-height: 34px;
+      display: flex; align-items: center; color: #1a1a2e;
+    }
+    .field-val.empty { color: #aaa; font-style: italic; }
+    .bool-true {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      background: #eafaf1; color: #1e8449; border: 1px solid #a9dfbf;
+    }
+    .bool-false {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      background: #f8f9fa; color: #aaa; border: 1px solid #dee2e6;
+    }
+    .section-hdr {
+      display: flex; align-items: center; gap: 10px;
+      background: #1a1a2e; color: white; padding: 10px 18px;
+      border-radius: 3px 3px 0 0;
+    }
+    .section-hdr .num {
+      font-family: "DM Serif Display", serif; font-size: 1.2rem;
+      color: #c0392b; min-width: 22px;
+    }
+    .section-hdr h3 {
+      font-family: "DM Serif Display", serif; font-size: 0.9rem; font-weight: 400; margin: 0;
+    }
+    .section-body {
+      background: #fffdf8; border: 1px solid #d5c9b8; border-top: none;
+      padding: 14px 16px; border-radius: 0 0 3px 3px; margin-bottom: 12px;
+    }
+    label.fld {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #7f8c8d; display: block; margin-bottom: 4px;
+    }
+    .lp-textarea {
+      width: 100%; min-height: 340px; padding: 12px; resize: vertical;
+      border: 1.5px solid #d5c9b8; border-radius: 3px;
+      font-family: "DM Sans", sans-serif; font-size: 0.88rem;
+      color: #1a1a2e; background: white; outline: none; line-height: 1.6;
+      transition: border-color 0.18s; box-sizing: border-box;
+    }
+    .lp-textarea:focus { border-color: #2980b9; box-shadow: 0 0 0 3px rgba(41,128,185,0.1); }
+    .lp-key {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid #d5c9b8; border-radius: 3px;
+      font-family: "DM Sans", sans-serif; font-size: 0.88rem;
+      color: #1a1a2e; background: white; outline: none;
+      transition: border-color 0.18s; box-sizing: border-box;
+    }
+    .lp-key:focus { border-color: #2980b9; }
+    .btn-analyze {
+      width: 100%; padding: 12px; border: none; border-radius: 3px;
+      background: #c0392b; color: white; font-family: "DM Sans", sans-serif;
+      font-size: 0.88rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-analyze:hover:not(:disabled) { background: #a93226; transform: translateY(-1px); }
+    .btn-analyze:disabled { background: #888; cursor: not-allowed; }
+    .btn-secondary {
+      width: 100%; padding: 9px; border: 1.5px solid #d5c9b8; border-radius: 3px;
+      background: white; color: #1a1a2e; font-family: "DM Sans", sans-serif;
+      font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: #f5f0e8; border-color: #aaa; }
+    .btn-copy {
+      padding: 10px 22px; border: none; border-radius: 3px;
+      background: #27ae60; color: white; font-family: "DM Sans", sans-serif;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase; cursor: pointer; transition: all 0.18s;
+    }
+    .btn-copy:hover { background: #1e8449; }
+    .btn-copy.copied { background: #2ecc71; }
+    .toast-wrap {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a2e; color: white; padding: 12px 20px;
+      border-radius: 4px; font-size: 0.85rem; font-weight: 500;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2); z-index: 9999;
+      display: flex; align-items: center; gap: 8px;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+      max-width: 380px;
+    }
+    .toast-wrap.show { transform: translateY(0); opacity: 1; }
+    .toast-wrap.success { border-left: 4px solid #27ae60; }
+    .toast-wrap.error { border-left: 4px solid #c0392b; }
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 16px; }
+    .checks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .two-col { display: grid; grid-template-columns: 410px 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .checks-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+/* ─── NOTA DE EJEMPLO ───────────────────────────────────────────────── */
+const NOTA_EJEMPLO = `Paciente de sexo femenino, 58 años. HC: 00456789.
+Fecha de consulta: 15/03/2026. Hospital Ramos Mejía. Cobertura: Obra Social OSDE.
+
+Motivo de consulta: Control de ERC estadio G3b. Derivada por nefrólogo de cabecera.
+
+Antecedentes: HTA de larga data. Diabetes tipo 2 insulinodependiente. ERC diagnosticada hace 5 años. Tabaquismo (ex fumadora desde hace 10 años). No refiere enfermedad coronaria ni insuficiencia cardíaca. Niega enfermedad vascular periférica, patología oncológica, autoinmune, litiasis renal, ITU a repetición ni HIV.
+
+Examen físico: TA 145/90 mmHg. Peso: 78 kg. Talla: 162 cm. Presenta edemas leves en miembros inferiores.
+
+Laboratorio: Creatinina 2.3 mg/dL. Urea 98 mg/dL. Hemoglobina 10.8 g/dL. Potasio 5.1 mEq/L. PTH 145 pg/mL. Proteinuria 650 mg/24hs. Albuminuria 320 mg/24hs.
+
+Biopsia renal realizada en 2022: compatible con nefropatía diabética con lesiones de GSFS secundario.
+
+Outcome: Sin internaciones recientes. No requirió diálisis. Sin episodios de AKI.
+
+Medicación actual: Enalapril 10 mg/día (IECA), Bisoprolol 5 mg/día, Empagliflozin 10 mg/día, Espironolactona 25 mg/día, Eritropoyetina semanal subcutánea.`;
+
+/* ─── VALIDACIÓN ────────────────────────────────────────────────────── */
+function validarJSON(d) {
+  const bools = ['erc','coronaria','ic','hta','tabaquismo','evp','dbt','oncologica',
+    'autoinmune','litiasis','itu','hiv','edemas','biopsia','aki','dialisis',
+    'internacion','ieca','bb','isglt2','mra','inmunosupresion','epo','glp1','med_obesidad'];
+  const nums = ['edad','tiempo_erc','tas','tad','peso','talla','urea','creatinina',
+    'proteinuria','albuminuria','hb','potasio','pth'];
+  const strs = ['hc','sexo','fecha','hospital','cobertura','motivo','biopsia_resultado'];
+  for (const k of bools) if (typeof d[k] !== 'boolean') return `Campo "${k}" debe ser booleano`;
+  for (const k of nums) if (d[k] !== null && typeof d[k] !== 'number') return `Campo "${k}" debe ser número o null`;
+  for (const k of strs) if (typeof d[k] !== 'string') return `Campo "${k}" debe ser string`;
+  if (d.fecha && d.fecha !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(d.fecha)) return 'Fecha no válida (esperado YYYY-MM-DD)';
+  return null;
+}
+
+/* ─── PARSER REGEX ──────────────────────────────────────────────────── */
+function parseNota(texto) {
+  const t = texto;
+
+  function esPositivo(patron) {
+    const re = new RegExp(patron, 'gi');
+    let m;
+    while ((m = re.exec(t)) !== null) {
+      const antes = t.substring(Math.max(0, m.index - 65), m.index);
+      const negado = /\b(no|niega|sin|ausente|neg(?:ativa|ado|ada)|descarta(?:do)?|sin\s+antecedentes?\s+de|sin\s+historia\s+de)\s*(?:[\w\s]{0,20})?$/i.test(antes.trim());
+      if (!negado) return true;
+    }
+    return false;
+  }
+
+  function extraerNum(patrones) {
+    for (const p of patrones) {
+      const re = new RegExp(p + '[:\\s=]+([0-9]+(?:[,\\.][0-9]+)?)', 'i');
+      const m = t.match(re);
+      if (m) return parseFloat(m[1].replace(',', '.'));
+    }
+    return null;
+  }
+
+  const r = {};
+
+  // Identificación
+  const hcM = t.match(/(?:HC|historia\s*cl[íi]nica|NHC|N[°º]?\s*HC)\s*[:\s#°nNº]*([A-Za-z0-9][A-Za-z0-9\-\/\.]{0,14})/i);
+  r.hc = hcM ? hcM[1].trim() : '';
+
+  const edadM = t.match(/(\d{1,3})\s*a[ñn]os?(?:\s+de\s+edad)?/i);
+  r.edad = edadM ? parseInt(edadM[1]) : null;
+
+  if (/\b(masculino|var[oó]n|hombre|sexo\s+m(?:asculino)?)\b/i.test(t)) r.sexo = 'Masculino';
+  else if (/\b(femenino|mujer|sexo\s+f(?:emenino)?)\b/i.test(t)) r.sexo = 'Femenino';
+  else r.sexo = '';
+
+  const fechaM = t.match(/(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/);
+  if (fechaM) {
+    let [, d, mo, y] = fechaM;
+    if (y.length === 2) y = '20' + y;
+    r.fecha = `${y}-${mo.padStart(2,'0')}-${d.padStart(2,'0')}`;
+  } else r.fecha = '';
+
+  if (/ramos\s*mej[íi]a/i.test(t)) r.hospital = 'Ramos Mejía';
+  else if (/favaloro/i.test(t)) r.hospital = 'Favaloro';
+  else if (/alem[aá]n/i.test(t)) r.hospital = 'Hospital Alemán';
+  else r.hospital = '';
+
+  if (/\b(PAMI|IOMA|OSDE|OS[A-Z]{2,}|obra\s+social)\b/i.test(t)) r.cobertura = 'Obra Social';
+  else if (/\bprepaga\b/i.test(t)) r.cobertura = 'Prepaga';
+  else if (/\bparticular\b/i.test(t)) r.cobertura = 'No';
+  else r.cobertura = '';
+
+  const motivoM = t.match(/(?:motivo[^:\n]{0,20}:|consulta\s+por[:\s]|derivad[ao]\s+por[:\s])([^\n.]{3,120})/i);
+  r.motivo = motivoM ? motivoM[1].trim() : '';
+
+  // Antecedentes booleanos
+  r.erc         = esPositivo('\\bERC\\b|enfermedad\\s+renal\\s+cr[oó]nica|nefropat[íi]a\\s+cr[oó]nica|insuficiencia\\s+renal\\s+cr[oó]nica|\\bIRC\\b|\\bCKD\\b');
+  r.coronaria   = esPositivo('enfermedad\\s+coronaria|cardiopat[íi]a\\s+isqu[eé]mica|\\bIAM\\b|infarto\\s+(?:agudo\\s+de\\s+)?miocardio|angioplastia\\s+coronaria|bypass\\s+coronario|\\bSCA\\b');
+  r.ic          = esPositivo('insuficiencia\\s+card[íi]aca|\\bICC\\b|falla\\s+card[íi]aca|miocardiopat[íi]a|disfunci[oó]n\\s+ventricular');
+  r.hta         = esPositivo('\\bHTA\\b|hipertensi[oó]n\\s+arterial|hipertenso[a]?\\b');
+  r.tabaquismo  = esPositivo('\\btabaquismo\\b|ex[\\s\\-]?fumador[a]?\\b|fumador[a]?\\s+activ|\\btabaco\\b|cigarrillos?');
+  r.evp         = esPositivo('enfermedad\\s+vascular\\s+perif[eé]rica|\\bEVP\\b|arteriopat[íi]a\\s+perif[eé]rica|claudicaci[oó]n|isquemia\\s+perif[eé]rica');
+  r.dbt         = esPositivo('\\bdiabetes\\b|diab[eé]tic[ao]\\b|\\bDBT\\b|\\bDM\\s?[12]?\\b|hipoglucemiante|insulinodependiente');
+  r.oncologica  = esPositivo('c[aá]ncer|\\btumor\\s+maligno|neoplasia\\s+maligna|carcinoma|\\blinfoma\\b|\\bleucemia\\b|\\bmelanoma\\b|met[áa]stasis|oncol[oó]gic');
+  r.autoinmune  = esPositivo('autoinmune|\\blupus\\b|\\bLES\\b|artritis\\s+reumatoide|\\bvasculitis\\b|esclerodermia|espondilitis\\s+anquilosante|sarcoidosis');
+  r.litiasis    = esPositivo('litiasis|c[aá]lculos?\\s+renales?|nefrolitiasis|urolitiasis|c[oó]lico\\s+(?:renal|ureteral|nefr[íi]tico)');
+  r.itu         = esPositivo('\\bITU\\b|infecciones?\\s+urinarias?|cistitis\\s+(?:recurrente|a\\s+repetici[oó]n)|pielonefritis|bacteriuria\\s+recurrente');
+  r.hiv         = esPositivo('\\bHIV\\b|\\bVIH\\b|\\bSIDA\\b|seropositiv');
+
+  // Tiempo ERC
+  r.tiempo_erc = null;
+  const tErcPats = [
+    /\bERC[^.]*?(?:hace|desde\s+hace)\s+(\d+(?:[.,]\d+)?)\s+a[ñn]os?/i,
+    /(\d+(?:[.,]\d+)?)\s+a[ñn]os?\s+(?:de\s+)?(?:ERC|evoluci[oó]n\s+(?:de\s+)?ERC|diagn[oó]stico\s+(?:de\s+)?ERC)/i,
+    /diagn[oó]sticad[ao]\s+hace\s+(\d+(?:[.,]\d+)?)\s+a[ñn]os?/i,
+  ];
+  for (const p of tErcPats) {
+    const m = t.match(p);
+    if (m) { r.tiempo_erc = parseFloat(m[1].replace(',','.')); break; }
+  }
+
+  // Examen físico
+  const taM = t.match(/(?:TA|T\.A\.|tensi[oó]n\s+arterial|presi[oó]n\s+arterial)[:\s]*(\d{2,3})[\/\-](\d{2,3})/i);
+  r.tas = taM ? parseInt(taM[1]) : null;
+  r.tad = taM ? parseInt(taM[2]) : null;
+  r.edemas = esPositivo('\\bedemas?\\b');
+
+  const pesoM = t.match(/peso[:\s=]*(\d+(?:[.,]\d+)?)\s*kg/i) || t.match(/(\d{2,3}(?:[.,]\d+)?)\s*kg\b/i);
+  r.peso = pesoM ? parseFloat(pesoM[1].replace(',','.')) : null;
+
+  const tallaM = t.match(/(?:talla|altura|estatura)[:\s=]*(\d+(?:[.,]\d+)?)\s*(?:cm|m(?:etros?)?)?/i) || t.match(/(\d{3})\s*cm\b/i);
+  if (tallaM) {
+    let v = parseFloat(tallaM[1].replace(',','.'));
+    if (v < 3) v = Math.round(v * 100);
+    r.talla = v;
+  } else r.talla = null;
+
+  // Laboratorio
+  r.urea        = extraerNum(['urea']);
+  r.creatinina  = extraerNum(['creatinina', 'creat\\.?\\b']);
+  r.proteinuria = extraerNum(['proteinuria', 'prote[íi]nas?\\s+(?:en\\s+)?orina', 'proteinas?\\s+24']);
+  r.albuminuria = extraerNum(['albuminuria', 'microalbuminuria', 'albumina\\s+(?:en\\s+)?orina']);
+  r.hb          = extraerNum(['\\bhb\\b', 'hemoglobina', '\\bhgb\\b']);
+  r.potasio     = extraerNum(['potasio', '\\bK\\+?\\b']);
+  r.pth         = extraerNum(['\\bPTH\\b', 'parathormona', 'paratohormona']);
+
+  // Biopsia
+  r.biopsia = esPositivo('biopsia\\s+renal|biopsia\\s+de\\s+ri[ñn][oó]n');
+  const biopsiaM = t.match(/biopsia[^:.\n]*?(?::|compatible\s+con|result[ao]do[:\s]+|informa[:\s]+)([^\n.]{5,100})/i);
+  r.biopsia_resultado = biopsiaM ? biopsiaM[1].trim() : '';
+
+  // Outcome
+  r.aki         = esPositivo('\\bAKI\\b|injuria\\s+renal\\s+aguda|da[ñn]o\\s+renal\\s+agudo|insuficiencia\\s+renal\\s+aguda|\\bAKD\\b');
+  r.dialisis    = esPositivo('di[aá]lisis|hemodiali|di[aá]lisis\\s+peritoneal|\\bDPA\\b|terapia\\s+de\\s+reemplazo\\s+renal|\\bIRCT\\b');
+  r.internacion = esPositivo('internaci[oó]n|hospitaliz(?:aci[oó]n|ado|ada)|ingres[ao]\\s+(?:al\\s+)?hospital');
+
+  // Medicación
+  r.ieca          = esPositivo('\\bIECA\\b|\\bARA\\s?II\\b|enalapril|losartan|ramipril|lisinopril|telmisartan|irbesartan|valsartan|perindopril|captopril|olmesartan|candesartan|sacubitril');
+  r.bb            = esPositivo('betabloqueante|beta.?bloqueante|bisoprolol|carvedilol|metoprolol|atenolol|nebivolol|propranolol');
+  r.isglt2        = esPositivo('\\biSGLT2\\b|\\bSGLT2\\b|empagliflozin|dapagliflozin|canagliflozin|flozin\\b');
+  r.mra           = esPositivo('\\bMRA\\b|finerenona|espironolactona|eplerenona|antialdoster[oó]nico|antagonista.{0,20}aldosterona');
+  r.inmunosupresion = esPositivo('inmunosupres|tacrolimus|ciclosporina|azatioprina|micofenolato|ciclofosfamida|rituximab|\\bprednisona\\b|metilprednisolona|hidroxicloroquina');
+  r.epo           = esPositivo('\\bEPO\\b|eritropoyetina|epoetina|darbepoetina|agente\\s+estimulante.*eritropoyesis');
+  r.glp1          = esPositivo('\\bGLP.?1\\b|semaglutida|liraglutida|dulaglutida|exenatida|tirzepatida|ozempic|victoza|wegovy|saxenda');
+  r.med_obesidad  = esPositivo('orlistat|bupropion.*naltrexona|medicaci[oó]n.{0,20}obesidad|tratamiento.{0,20}obesidad');
+
+  return r;
+}
+
+/* ─── CLAUDE API ────────────────────────────────────────────────────── */
+async function parseConClaude(texto, apiKey) {
+  const system = `Eres un asistente de extracción de datos médicos para nefrología. Analizas textos clínicos en español y retornas ÚNICAMENTE JSON válido.
+
+REGLAS DE INCERTIDUMBRE (obligatorias):
+- Dato numérico ausente en el texto → null
+- Dato de texto ausente en el texto → "" (cadena vacía)
+- Antecedente booleano no mencionado o negado explícitamente → false
+- Antecedente booleano mencionado positivamente → true
+- Detectá negaciones: "no", "niega", "sin", "ausente", "descarta", "no refiere", "sin antecedentes de"
+
+CAMPOS CONTROLADOS:
+- sexo: solo "Masculino" | "Femenino" | ""
+- hospital: solo "Ramos Mejía" | "Favaloro" | "Hospital Alemán" | ""
+- cobertura: solo "No" | "Obra Social" | "Prepaga" | ""
+- fecha: formato "YYYY-MM-DD" o ""`;
+
+  const user = `Extraé todos los datos clínicos del siguiente texto y retorná ÚNICAMENTE el JSON, sin texto adicional, sin markdown, sin explicaciones:
+
+${texto}
+
+Estructura JSON requerida (todos los campos son obligatorios):
+{"hc":"","edad":null,"sexo":"","fecha":"","hospital":"","cobertura":"","motivo":"","erc":false,"coronaria":false,"ic":false,"hta":false,"tabaquismo":false,"evp":false,"dbt":false,"oncologica":false,"autoinmune":false,"litiasis":false,"itu":false,"hiv":false,"tiempo_erc":null,"tas":null,"tad":null,"edemas":false,"peso":null,"talla":null,"urea":null,"creatinina":null,"proteinuria":null,"albuminuria":null,"hb":null,"potasio":null,"pth":null,"biopsia":false,"biopsia_resultado":"","aki":false,"dialisis":false,"internacion":false,"ieca":false,"bb":false,"isglt2":false,"mra":false,"inmunosupresion":false,"epo":false,"glp1":false,"med_obesidad":false}`;
+
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-iab': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1200,
+      system,
+      messages: [{ role: 'user', content: user }],
+    }),
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  const raw = data.content[0].text.trim();
+  const jsonMatch = raw.match(/\{[\s\S]+\}/);
+  if (!jsonMatch) throw new Error('Respuesta inesperada de Claude');
+  return JSON.parse(jsonMatch[0]);
+}
+
+/* ─── COMPONENTES ────────────────────────────────────────────────────── */
+function FieldVal({ label, value, unit }) {
+  const empty = value === null || value === undefined || value === '';
+  return (
+    <div>
+      <label className="fld">{label}</label>
+      <div className={`field-val${empty ? ' empty' : ''}`}>
+        {empty ? '—' : (unit ? `${value} ${unit}` : String(value))}
+      </div>
+    </div>
+  );
+}
+
+function BoolBadge({ label, value }) {
+  return (
+    <div style={{display:'flex', flexDirection:'column', gap:4}}>
+      <label className="fld">{label}</label>
+      <span className={value ? 'bool-true' : 'bool-false'}>
+        {value ? '✓ Sí' : '✗ No'}
+      </span>
+    </div>
+  );
+}
+
+function Sec({ num, title, children }) {
+  return (
+    <div>
+      <div className="section-hdr">
+        <span className="num">{num}</span>
+        <h3>{title}</h3>
+      </div>
+      <div className="section-body">{children}</div>
+    </div>
+  );
+}
+
+function FormPreview({ data }) {
+  return (
+    <div>
+      <Sec num="1" title="Identificación">
+        <div className="grid-3" style={{marginBottom:10}}>
+          <FieldVal label="N° HC" value={data.hc} />
+          <FieldVal label="Edad" value={data.edad} unit="años" />
+          <FieldVal label="Sexo" value={data.sexo} />
+          <FieldVal label="Fecha" value={data.fecha} />
+          <FieldVal label="Hospital" value={data.hospital} />
+          <FieldVal label="Cobertura" value={data.cobertura} />
+        </div>
+        <div>
+          <label className="fld">Motivo de consulta</label>
+          <div className="field-val" style={{minHeight:44, alignItems:'flex-start', paddingTop:8, flexWrap:'wrap'}}>
+            {data.motivo || <span style={{color:'#aaa',fontStyle:'italic'}}>—</span>}
+          </div>
+        </div>
+      </Sec>
+
+      <Sec num="2" title="Antecedentes">
+        <div className="checks-grid">
+          <BoolBadge label="ERC" value={data.erc} />
+          <BoolBadge label="Coronaria" value={data.coronaria} />
+          <BoolBadge label="Insuf. Cardíaca" value={data.ic} />
+          <BoolBadge label="HTA" value={data.hta} />
+          <BoolBadge label="Tabaquismo" value={data.tabaquismo} />
+          <BoolBadge label="Enf. Vasc. Perif." value={data.evp} />
+          <BoolBadge label="Diabetes" value={data.dbt} />
+          <BoolBadge label="Oncológica" value={data.oncologica} />
+          <BoolBadge label="Autoinmune" value={data.autoinmune} />
+          <BoolBadge label="Litiasis" value={data.litiasis} />
+          <BoolBadge label="ITU a Repetición" value={data.itu} />
+          <BoolBadge label="HIV" value={data.hiv} />
+        </div>
+        {(data.erc || data.tiempo_erc !== null) && (
+          <div style={{marginTop:10, paddingTop:10, borderTop:'1px dashed #d5c9b8'}}>
+            <FieldVal label="Tiempo ERC (años)" value={data.tiempo_erc} />
+          </div>
+        )}
+      </Sec>
+
+      <Sec num="3" title="Examen Físico">
+        <div className="grid-3">
+          <FieldVal label="TA Sistólica" value={data.tas} unit="mmHg" />
+          <FieldVal label="TA Diastólica" value={data.tad} unit="mmHg" />
+          <BoolBadge label="Edemas" value={data.edemas} />
+          <FieldVal label="Peso" value={data.peso} unit="kg" />
+          <FieldVal label="Talla" value={data.talla} unit="cm" />
+        </div>
+      </Sec>
+
+      <Sec num="4" title="Laboratorio">
+        <div className="grid-3">
+          <FieldVal label="Urea" value={data.urea} unit="mg/dL" />
+          <FieldVal label="Creatinina" value={data.creatinina} unit="mg/dL" />
+          <FieldVal label="Hemoglobina" value={data.hb} unit="g/dL" />
+          <FieldVal label="Potasio" value={data.potasio} unit="mEq/L" />
+          <FieldVal label="PTH" value={data.pth} unit="pg/mL" />
+          <FieldVal label="Proteinuria" value={data.proteinuria} unit="mg/24hs" />
+          <FieldVal label="Albuminuria" value={data.albuminuria} unit="mg/24hs" />
+        </div>
+      </Sec>
+
+      <Sec num="5" title="Biopsia Renal">
+        <div className="grid-2">
+          <BoolBadge label="Biopsia realizada" value={data.biopsia} />
+          <FieldVal label="Resultado" value={data.biopsia_resultado} />
+        </div>
+      </Sec>
+
+      <Sec num="6" title="Outcome / Evolución">
+        <div className="grid-3">
+          <BoolBadge label="AKI / AKD" value={data.aki} />
+          <BoolBadge label="Diálisis" value={data.dialisis} />
+          <BoolBadge label="Internación" value={data.internacion} />
+        </div>
+      </Sec>
+
+      <Sec num="7" title="Medicación">
+        <div className="checks-grid">
+          <BoolBadge label="IECA / ARA II" value={data.ieca} />
+          <BoolBadge label="Betabloqueantes" value={data.bb} />
+          <BoolBadge label="iSGLT2" value={data.isglt2} />
+          <BoolBadge label="MRA" value={data.mra} />
+          <BoolBadge label="Inmunosupresión" value={data.inmunosupresion} />
+          <BoolBadge label="EPO" value={data.epo} />
+          <BoolBadge label="GLP-1" value={data.glp1} />
+          <BoolBadge label="Med. Obesidad" value={data.med_obesidad} />
+        </div>
+      </Sec>
+    </div>
+  );
+}
+
+/* ─── SYNTAX HIGHLIGHT JSON ─────────────────────────────────────────── */
+function highlightJSON(json) {
+  return json.replace(
+    /("(?:\\.|[^"\\])*"(\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+    match => {
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) return `<span style="color:#7ec8e3">${match}</span>`;
+        return `<span style="color:#f9c784">${match}</span>`;
+      }
+      if (match === 'true')  return `<span style="color:#98c379">${match}</span>`;
+      if (match === 'false') return `<span style="color:#e06c75">${match}</span>`;
+      if (match === 'null')  return `<span style="color:#888">${match}</span>`;
+      return `<span style="color:#d19a66">${match}</span>`;
+    }
+  );
+}
+
+/* ─── APP ───────────────────────────────────────────────────────────── */
+function App() {
+  const [noteText, setNoteText]   = useState('');
+  const [parsed, setParsed]       = useState(null);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
+  const [useApi, setUseApi]       = useState(false);
+  const [apiKey, setApiKey]       = useState('');
+  const [method, setMethod]       = useState('');
+  const [tab, setTab]             = useState('form');
+  const [copied, setCopied]       = useState(false);
+  const [toast, setToast]         = useState({ msg:'', type:'', show:false });
+  const toastTimer                = useRef(null);
+
+  function showToast(msg, type = 'success') {
+    clearTimeout(toastTimer.current);
+    setToast({ msg, type, show: true });
+    toastTimer.current = setTimeout(() => setToast(s => ({...s, show:false})), 3500);
+  }
+
+  async function analizar() {
+    if (!noteText.trim()) { setError('Ingresá el texto de la historia clínica.'); return; }
+    setError(''); setLoading(true); setParsed(null);
+    try {
+      let datos;
+      if (useApi && apiKey.trim()) {
+        datos = await parseConClaude(noteText, apiKey.trim());
+        setMethod('Claude API — claude-haiku-4-5');
+      } else {
+        datos = parseNota(noteText);
+        setMethod('Parser regex inteligente');
+      }
+      const err = validarJSON(datos);
+      if (err) throw new Error('JSON inválido: ' + err);
+      setParsed(datos);
+      setTab('form');
+      showToast('Datos extraídos correctamente', 'success');
+    } catch (e) {
+      setError(e.message);
+      showToast('Error: ' + e.message.slice(0, 80), 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function copyJSON() {
+    if (!parsed) return;
+    navigator.clipboard.writeText(JSON.stringify(parsed, null, 2)).then(() => {
+      setCopied(true);
+      showToast('JSON copiado — pegalo en ⚡ Autocarga IA del formulario', 'success');
+      setTimeout(() => setCopied(false), 2200);
+    });
+  }
+
+  const TAB_BTN = (id, label) => (
+    <button onClick={() => setTab(id)} style={{
+      padding:'6px 16px', borderRadius:3, border:'1.5px solid',
+      fontSize:'0.78rem', fontWeight:600, cursor:'pointer',
+      background: tab===id ? '#1a1a2e' : 'white',
+      color: tab===id ? 'white' : '#1a1a2e',
+      borderColor: tab===id ? '#1a1a2e' : '#d5c9b8',
+    }}>{label}</button>
+  );
+
+  return (
+    <div style={{minHeight:'100vh', background:'#f5f0e8'}}>
+
+      {/* HEADER */}
+      <header style={{background:'#1a1a2e', color:'white', padding:'22px 40px 18px', borderBottom:'4px solid #c0392b', position:'relative', overflow:'hidden', display:'flex', alignItems:'flex-end', gap:18}}>
+        <div style={{position:'absolute', top:-50, right:-50, width:170, height:170, borderRadius:'50%', border:'34px solid rgba(192,57,43,0.12)'}} />
+        <div style={{fontSize:36, lineHeight:1, flexShrink:0}}>🧬</div>
+        <div>
+          <h1 style={{fontFamily:'"DM Serif Display",serif', fontSize:'1.65rem', fontWeight:400, lineHeight:1.1, letterSpacing:'-0.5px', margin:0}}>
+            Parser de Historia Clínica
+          </h1>
+          <p style={{fontSize:'0.73rem', color:'rgba(255,255,255,0.5)', marginTop:3, letterSpacing:'0.06em', textTransform:'uppercase'}}>
+            Registro Nefrológico · Autocarga IA
+          </p>
+        </div>
+        <div style={{marginLeft:'auto', flexShrink:0}}>
+          <a href="index.html" style={{background:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.75)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:3, padding:'7px 15px', fontSize:'0.73rem', fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase', textDecoration:'none', display:'inline-block'}}>
+            ← Formulario principal
+          </a>
+        </div>
+      </header>
+
+      {/* MAIN */}
+      <div style={{maxWidth:1340, margin:'0 auto', padding:'28px 18px 60px'}}>
+
+        {/* Info banner */}
+        <div style={{background:'#eaf4fb', border:'1.5px solid #aed6f1', borderRadius:4, padding:'11px 16px', marginBottom:22, fontSize:'0.82rem', color:'#1a5276', display:'flex', alignItems:'center', gap:10}}>
+          <span style={{fontSize:16}}>💡</span>
+          <span>
+            <strong>Cómo usarlo:</strong> Pegá la historia clínica → <strong>Analizar</strong> → <strong>Copiar JSON</strong> → en el formulario principal presioná <strong>⚡ Autocarga IA</strong> y pegá el JSON.
+          </span>
+        </div>
+
+        {/* TWO COLUMNS */}
+        <div className="two-col">
+
+          {/* ── LEFT: INPUT ── */}
+          <div style={{position:'sticky', top:16}}>
+            <div style={{background:'#fffdf8', border:'1px solid #d5c9b8', borderRadius:4, boxShadow:'0 2px 12px rgba(26,26,46,0.08)', overflow:'hidden', marginBottom:12}}>
+              <div className="section-hdr">
+                <span className="num" style={{fontSize:'1rem'}}>✏</span>
+                <h3>Nota Clínica</h3>
+              </div>
+              <div style={{padding:'14px 16px'}}>
+                <textarea
+                  className="lp-textarea"
+                  value={noteText}
+                  onChange={e => setNoteText(e.target.value)}
+                  placeholder={"Pegá aquí el texto de la historia clínica...\n\nEjemplo:\nPaciente de sexo femenino, 58 años. HC: 00456789.\nAntecedentes: HTA, Diabetes tipo 2, ERC G3b..."}
+                />
+
+                {/* API toggle */}
+                <div style={{margin:'10px 0', padding:'10px 12px', background:'#f8f9fa', borderRadius:3, border:'1px solid #e8e3d8'}}>
+                  <label style={{display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:'0.83rem', fontWeight:500}}>
+                    <input type="checkbox" checked={useApi} onChange={e => setUseApi(e.target.checked)}
+                      style={{accentColor:'#2980b9', width:15, height:15, cursor:'pointer'}} />
+                    <span>Usar Claude API (mayor precisión)</span>
+                  </label>
+                  {useApi && (
+                    <div style={{marginTop:8}}>
+                      <label className="fld" style={{marginBottom:3}}>API Key de Anthropic</label>
+                      <input type="password" className="lp-key" value={apiKey}
+                        onChange={e => setApiKey(e.target.value)} placeholder="sk-ant-api03-..." />
+                      <p style={{fontSize:'0.69rem', color:'#888', marginTop:3, lineHeight:1.4}}>
+                        La clave no se guarda. Requiere acceso a api.anthropic.com desde el navegador.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <button className="btn-analyze" onClick={analizar} disabled={loading}>
+                  {loading
+                    ? <span style={{display:'flex', alignItems:'center', justifyContent:'center', gap:8}}><span className="spinner" /> Analizando...</span>
+                    : '⚡ Analizar Historia Clínica'
+                  }
+                </button>
+                <button className="btn-secondary" style={{marginTop:7}} onClick={() => { setNoteText(NOTA_EJEMPLO); setParsed(null); setError(''); }}>
+                  Cargar nota de ejemplo
+                </button>
+
+                {error && (
+                  <div style={{marginTop:10, padding:'10px 12px', background:'#fdedec', border:'1.5px solid #f1948a', borderRadius:3, fontSize:'0.81rem', color:'#922b21', lineHeight:1.5}}>
+                    ⚠ {error}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{padding:'12px 14px', background:'#fffdf8', border:'1px solid #d5c9b8', borderRadius:4, fontSize:'0.77rem', color:'#555', lineHeight:1.8}}>
+              <strong style={{color:'#1a1a2e', display:'block', marginBottom:3}}>Próximo paso:</strong>
+              1. Copiá el JSON generado<br/>
+              2. Abrí el <a href="index.html" style={{color:'#2980b9', fontWeight:600}}>formulario principal</a><br/>
+              3. Presioná <strong>⚡ Autocarga IA</strong><br/>
+              4. Pegá el JSON → <strong>✓ Autocompletar</strong>
+            </div>
+          </div>
+
+          {/* ── RIGHT: OUTPUT ── */}
+          <div>
+            {!parsed && !loading && (
+              <div style={{background:'#fffdf8', border:'1.5px dashed #d5c9b8', borderRadius:4, padding:'70px 24px', textAlign:'center'}}>
+                <div style={{fontSize:52, marginBottom:14}}>🩺</div>
+                <p style={{fontSize:'1.05rem', fontFamily:'"DM Serif Display",serif', color:'#aaa', marginBottom:8, fontWeight:400}}>
+                  Los datos extraídos aparecerán aquí
+                </p>
+                <p style={{fontSize:'0.82rem', color:'#bbb'}}>
+                  Pegá una nota clínica y presioná <strong style={{color:'#c0392b'}}>⚡ Analizar</strong>
+                </p>
+              </div>
+            )}
+
+            {loading && (
+              <div style={{background:'#fffdf8', border:'1px solid #d5c9b8', borderRadius:4, padding:'70px 24px', textAlign:'center'}}>
+                <div className="spinner" style={{width:38, height:38, border:'3px solid #d5c9b8', borderTopColor:'#2980b9', margin:'0 auto 16px', display:'block'}} />
+                <p style={{color:'#555', fontSize:'0.9rem'}}>Procesando historia clínica...</p>
+              </div>
+            )}
+
+            {parsed && (
+              <div>
+                {/* Header row */}
+                <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:14, flexWrap:'wrap'}}>
+                  <span style={{background:'#eafaf1', color:'#1e8449', border:'1px solid #a9dfbf', borderRadius:20, padding:'4px 12px', fontSize:'0.74rem', fontWeight:700, letterSpacing:'0.04em', textTransform:'uppercase'}}>
+                    ✓ Datos extraídos
+                  </span>
+                  <span style={{fontSize:'0.74rem', color:'#888'}}>{method}</span>
+                  <div style={{marginLeft:'auto', display:'flex', gap:6}}>
+                    {TAB_BTN('form','Formulario')}
+                    {TAB_BTN('json','JSON')}
+                  </div>
+                </div>
+
+                {/* Copy button top */}
+                <div style={{display:'flex', justifyContent:'flex-end', marginBottom:10}}>
+                  <button className={`btn-copy${copied ? ' copied' : ''}`} onClick={copyJSON}>
+                    {copied ? '✓ ¡Copiado!' : '📋 Copiar JSON'}
+                  </button>
+                </div>
+
+                {/* Tab content */}
+                {tab === 'form' && <FormPreview data={parsed} />}
+
+                {tab === 'json' && (
+                  <div style={{background:'#1a1a2e', borderRadius:4, padding:'16px', overflow:'auto', maxHeight:620}}>
+                    <pre
+                      style={{color:'#abb2bf', fontSize:'0.78rem', lineHeight:1.75, fontFamily:'"Consolas","Monaco",monospace', margin:0, whiteSpace:'pre-wrap', wordBreak:'break-all'}}
+                      dangerouslySetInnerHTML={{__html: highlightJSON(JSON.stringify(parsed, null, 2))}}
+                    />
+                  </div>
+                )}
+
+                {/* Bottom action bar */}
+                <div style={{display:'flex', gap:10, marginTop:14, justifyContent:'flex-end', flexWrap:'wrap'}}>
+                  <button className={`btn-copy${copied ? ' copied' : ''}`} onClick={copyJSON}>
+                    {copied ? '✓ ¡Copiado!' : '📋 Copiar JSON para Autocarga'}
+                  </button>
+                  <a href="index.html" style={{padding:'10px 20px', border:'1.5px solid #d5c9b8', borderRadius:3, background:'white', color:'#1a1a2e', fontSize:'0.8rem', fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase', textDecoration:'none', display:'inline-flex', alignItems:'center'}}>
+                    Ir al Formulario →
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* TOAST */}
+      <div className={`toast-wrap ${toast.type}${toast.show ? ' show' : ''}`}>
+        {toast.type === 'success' ? '✓' : '⚠'} {toast.msg}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
