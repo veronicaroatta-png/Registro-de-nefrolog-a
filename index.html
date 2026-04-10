@@ -1381,7 +1381,7 @@ async function precargarPaciente() {
 
   msgEl.style.color = '#1e8449';
   msgEl.textContent = `✓ Datos cargados desde la última visita (${formatFecha(ultima['Fecha'])}). Total: ${n} consulta${n!==1?'s':''} previas. Completá los datos nuevos y guardá.`;
-  mostrarToast(`✓ Paciente HC ${hcBusq} precargado — ${n} visita${n!==1?'s':'a} previa${n!==1?'s':''}.`, 'success');
+  mostrarToast('✓ Paciente HC ' + hcBusq + ' precargado — ' + n + ' visita' + (n!==1?'s':'a') + ' previa' + (n!==1?'s':'') + '.', 'success');
 }
 
 // ═══════════════════════════════════════════════════════════════
