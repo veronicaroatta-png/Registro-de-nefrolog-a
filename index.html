@@ -1267,10 +1267,10 @@ async function exportarPDFPaciente() {
   </div>
 
   <div class="section-title">Antecedentes</div>
-  <div class="tags">${antList.length ? antList.map(a=>`<span class="tag">${a}</span>`).join('') : '<span style="color:#aaa">Sin antecedentes cargados</span>'}</div>
+  <div class="tags">${antList.length ? antList.map(a=>'<span class="tag">'+a+'</span>').join('') : '<span style="color:#aaa">Sin antecedentes cargados</span>'}</div>
 
   <div class="section-title">Medicación actual</div>
-  <div class="tags">${medList.length ? medList.map(m=>`<span class="tag med">${m}</span>`).join('') : '<span style="color:#aaa">Sin medicación cargada</span>'}</div>
+  <div class="tags">${medList.length ? medList.map(m=>'<span class="tag med">'+m+'</span>').join('') : '<span style="color:#aaa">Sin medicación cargada</span>'}</div>
 
   <div class="section-title">Historial de consultas</div>
   <table>
@@ -1484,9 +1484,9 @@ function generarPDFResumen(visitas, hc) {
   const kfrecat = ultima['KFRE Categoría'] || '';
   const kfreHTML = (kfre2 || kfre5) ? `
     <div class="pdf-kfre-box">
-      ${kfre2 ? `<div class="pdf-kfre-val"><div class="pdf-kfre-num">${kfre2}</div><div class="pdf-kfre-lbl">Riesgo 2 años</div></div>` : ''}
-      ${kfre5 ? `<div class="pdf-kfre-val"><div class="pdf-kfre-num">${kfre5}</div><div class="pdf-kfre-lbl">Riesgo 5 años</div></div>` : ''}
-      ${kfrecat ? `<div style="margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,0.7);">Categoría: <strong style="color:white">${kfrecat}</strong></div>` : ''}
+      ${kfre2 ? '<div class=\"pdf-kfre-val\"><div class=\"pdf-kfre-num\">' + kfre2 + '</div><div class=\"pdf-kfre-lbl\">Riesgo 2 años</div></div>' : ''}
+      ${kfre5 ? '<div class=\"pdf-kfre-val\"><div class=\"pdf-kfre-num\">' + kfre5 + '</div><div class=\"pdf-kfre-lbl\">Riesgo 5 años</div></div>' : ''}
+      ${kfrecat ? '<div style=\"margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,0.7);">Categoría: <strong style=\"color:white\">' + kfrecat + '</strong></div>' : ''}
     </div>` : '';
 
   const html = `
@@ -1516,16 +1516,16 @@ function generarPDFResumen(visitas, hc) {
       <div class="pdf-field"><div class="pdf-field-label">Tiempo en seguimiento</div><div class="pdf-field-value">${calcularTiempoSeguimiento(primera['Fecha'], ultima['Fecha'])}</div></div>
     </div>
 
-    ${kfreHTML ? `<div class="pdf-section-title">Score KFRE</div>${kfreHTML}` : ''}
+    ${kfreHTML ? '<div class=\"pdf-section-title\">Score KFRE</div>' + kfreHTML : ''}
 
     <div class="pdf-section-title">Laboratorio — Última visita (${formatFecha(ultima['Fecha'])})</div>
     <div class="pdf-grid">${labHTML || '<div style="color:#aaa;font-size:0.82rem;padding:8px;">Sin laboratorio registrado.</div>'}</div>
 
     <div class="pdf-section-title">Antecedentes</div>
-    <div class="pdf-chips">${antActivos.length ? antActivos.map(a=>`<span class="pdf-chip">${a}</span>`).join('') : '<span style="color:#aaa;font-size:0.8rem;">Ninguno registrado</span>'}</div>
+    <div class="pdf-chips">${antActivos.length ? antActivos.map(a=>'<span class="pdf-chip">'+a+'</span>').join('') : '<span style="color:#aaa;font-size:0.8rem;">Ninguno registrado</span>'}</div>
 
     <div class="pdf-section-title">Medicación activa</div>
-    <div class="pdf-chips">${medActiva.length ? medActiva.map(m=>`<span class="pdf-chip med">${m}</span>`).join('') : '<span style="color:#aaa;font-size:0.8rem;">Ninguna registrada</span>'}</div>
+    <div class="pdf-chips">${medActiva.length ? medActiva.map(m=>'<span class="pdf-chip med">'+m+'</span>').join('') : '<span style="color:#aaa;font-size:0.8rem;">Ninguna registrada</span>'}</div>
 
     <div class="pdf-section-title">Historial de consultas (FGe)</div>
     <div class="pdf-timeline-mini">${timelineHTML}</div>
@@ -1694,10 +1694,10 @@ function renderSeguimiento(visitas, hc) {
         <div class="seg-visit-dot ${dotCls}"></div>
         <div class="seg-visit-card">
           <div style="display:flex;align-items:baseline;gap:4px;flex-wrap:wrap;">
-            ${!isNaN(fge) && fge > 0 ? `<span class="seg-visit-fge">${fge.toFixed(0)}</span><span class="seg-visit-fge-unit">mL/min/1.73m²</span>${deltaHTML}` : '<span style="color:var(--muted);font-size:0.85rem;">Sin FGe registrado</span>'}
+            ${!isNaN(fge) && fge > 0 ? '<span class="seg-visit-fge">'+fge.toFixed(0)+'</span><span class="seg-visit-fge-unit">mL/min/1.73m²</span>'+deltaHTML : '<span style="color:var(--muted);font-size:0.85rem;">Sin FGe registrado</span>'}
           </div>
           <div class="seg-visit-meta">${estadio}${kfre5 ? ' · KFRE 5a: '+kfre5 : ''}${v['Motivo']?'<br>'+v['Motivo'].substring(0,80)+(v['Motivo'].length>80?'...':''):''}</div>
-          ${labChips ? `<div class="seg-visit-labs">${labChips}</div>` : ''}
+          ${labChips ? '<div class="seg-visit-labs">'+labChips+'</div>' : ''}
         </div>
       </div>`;
   });
