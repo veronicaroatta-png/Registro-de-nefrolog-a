@@ -200,16 +200,20 @@
   <div class="login-card">
     <div class="login-logo">🩺</div>
     <div class="login-title">Registro Nefrológico</div>
-    <div class="login-sub">Acceso restringido · Ingresá tu contraseña</div>
-    <label class="login-label" for="login-password">Contraseña</label>
+    <div class="login-sub">Acceso restringido · Ingresá tus credenciales</div>
+    <label class="login-label" for="login-user">Usuario</label>
+    <input class="login-input" type="text" id="login-user" placeholder="Ej: Nefrologia"
+      onkeydown="if(event.key==='Enter') document.getElementById('login-password').focus()" autocomplete="username">
+    <label class="login-label" for="login-password" style="margin-top:12px;">Contraseña</label>
     <input class="login-input" type="password" id="login-password" placeholder="••••••••"
-      onkeydown="if(event.key==='Enter') intentarLogin()">
+      onkeydown="if(event.key==='Enter') intentarLogin()" autocomplete="current-password">
     <div class="login-error" id="login-error"></div>
     <button class="login-btn" id="login-btn" onclick="intentarLogin()">Ingresar</button>
   </div>
 </div>
 <div id="app-content">
 <header> <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+ <span class="logout-btn" id="user-display" style="right:140px;background:rgba(39,174,96,0.2);border-color:rgba(39,174,96,0.4);color:#58d68d;cursor:default;"></span>
  <div class="header-icon">🩺</div> <div> <h1>Registro Nefrológico</h1> <p>Sistema de carga y seguimiento de pacientes · CKD-EPI + KFRE automáticos</p> </div></header><div class="container"><!-- BÚSQUEDA RÁPIDA PARA CARGAR SEGUIMIENTO -->
 <div id="busqueda-rapida">
   <div style="flex:1;min-width:200px;">
@@ -313,6 +317,8 @@
 const WORKER_URL = 'https://nefro-proxy.veronicaroatta.workers.dev';
 
 let _dbCache = null;
+let _currentUser = '';
+let _currentRole = '';
 
 // ─── RATE LIMITING (anti-fuerza-bruta) ───────────────────────────────────────
 const _RL_KEY    = 'nefro_rl';
@@ -383,7 +389,7 @@ async function _deriveKey(password) {
     'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
   );
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: enc.encode('nefro-hc-v1'), iterations: 100000, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt: enc.encode('nefro-hc-v1'), iterations: 600000, hash: 'SHA-256' },
     keyMat, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
   );
 }
@@ -412,11 +418,34 @@ async function decryptHC(ciphertext) {
 
 // ─── AUTENTICACIÓN ────────────────────────────────────────────────────────────
 function getToken() { return sessionStorage.getItem('nefroToken') || ''; }
+function getUser()  { return sessionStorage.getItem('nefroUser') || ''; }
+function getRole()  { return sessionStorage.getItem('nefroRole') || ''; }
 function authHdr()  { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
 
 function mostrarLogin(visible) {
   document.getElementById('login-overlay').style.display = visible ? 'flex' : 'none';
   document.getElementById('app-content').style.display  = visible ? 'none'  : 'block';
+}
+
+function aplicarRol(role) {
+  _currentRole = role;
+  // Elementos que solo ve el admin
+  const adminOnly = ['btn-analytics', 'btn-seguimiento'];
+  const dbSection = document.getElementById('db-section');
+
+  if (role === 'registro') {
+    // Ocultar sección de base de datos completa
+    if (dbSection) dbSection.style.display = 'none';
+  } else {
+    if (dbSection) dbSection.style.display = '';
+  }
+
+  // Mostrar nombre de usuario en header
+  const userDisplay = document.getElementById('user-display');
+  if (userDisplay) {
+    userDisplay.textContent = _currentUser || '';
+    userDisplay.style.display = _currentUser ? '' : 'none';
+  }
 }
 
 async function intentarLogin() {
@@ -429,31 +458,43 @@ async function intentarLogin() {
     return;
   }
 
+  const user  = (document.getElementById('login-user').value || '').trim();
   const pass  = document.getElementById('login-password').value.trim();
+  if (!user) { errEl.textContent = 'Ingresá tu nombre de usuario.'; return; }
   if (!pass) { errEl.textContent = 'Ingresá la contraseña.'; return; }
   errEl.textContent = '';
   document.getElementById('login-btn').textContent = 'Verificando...';
   try {
-    sessionStorage.setItem('nefroToken', pass);
-    const r = await fetch(WORKER_URL, { headers: authHdr() });
+    const token = user + ':' + pass;
+    sessionStorage.setItem('nefroToken', token);
+    sessionStorage.setItem('nefroUser', user);
+    const r = await fetch(WORKER_URL + '?action=whoami', { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } });
     if (r.status === 401) {
       sessionStorage.removeItem('nefroToken');
+      sessionStorage.removeItem('nefroUser');
+      sessionStorage.removeItem('nefroRole');
       const attempts = _rlFail();
       const remaining = _RL_MAX - attempts;
       errEl.textContent = remaining > 0
-        ? `❌ Contraseña incorrecta. ${remaining} intento${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`
+        ? `❌ Usuario o contraseña incorrectos. ${remaining} intento${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`
         : `🔒 Cuenta bloqueada por ${_RL_LOCK / 60000} minutos por exceso de intentos.`;
       document.getElementById('login-btn').textContent = 'Ingresar';
       return;
     }
+    const whoami = await r.json();
+    const role = whoami.role || 'registro';
+    sessionStorage.setItem('nefroRole', role);
+    _currentUser = user;
+    _currentRole = role;
     _rlReset();
     _cryptoKey = await _deriveKey(pass);
     mostrarLogin(false);
+    aplicarRol(role);
     _initSessionTimeout();
     await renderTabla();
-    mostrarToast('✓ Sesión iniciada.', 'success');
+    mostrarToast(`✓ Bienvenido/a, ${user}.`, 'success');
   } catch(e) {
-    errEl.textContent = '⚠️ Error de conexión.';
+    errEl.textContent = '⚠️ Error de conexión. Verificá tu internet.';
     document.getElementById('login-btn').textContent = 'Ingresar';
   }
 }
@@ -461,6 +502,10 @@ async function intentarLogin() {
 function cerrarSesion() {
   if (!confirm('¿Cerrar sesión?')) return;
   sessionStorage.removeItem('nefroToken');
+  sessionStorage.removeItem('nefroUser');
+  sessionStorage.removeItem('nefroRole');
+  _currentUser = '';
+  _currentRole = '';
   location.reload();
 }
 
@@ -1986,19 +2031,26 @@ async function renderAnalytics() {
   document.getElementById('fecha').valueAsDate = new Date();
   // Si ya hay token guardado en la sesión, intentar cargar directamente
   if (getToken()) {
-    const r = await fetch(WORKER_URL, { headers: authHdr() }).catch(() => null);
+    const r = await fetch(WORKER_URL + '?action=whoami', { headers: authHdr() }).catch(() => null);
     if (r && r.status !== 401) {
+      const whoami = await r.json().catch(() => ({}));
+      _currentUser = getUser();
+      _currentRole = whoami.role || getRole() || 'registro';
+      sessionStorage.setItem('nefroRole', _currentRole);
       // Al recargar la página el token persiste pero la clave AES no.
       // Pedimos la contraseña solo para reconstruir la clave de cifrado.
       const pass2 = prompt('Ingresá tu contraseña para descifrar los N° HC:');
       if (pass2) _cryptoKey = await _deriveKey(pass2);
       mostrarLogin(false);
+      aplicarRol(_currentRole);
       _initSessionTimeout();
       mostrarToast('Cargando registros desde Airtable...', '');
       await renderTabla();
       return;
     }
     sessionStorage.removeItem('nefroToken');
+    sessionStorage.removeItem('nefroUser');
+    sessionStorage.removeItem('nefroRole');
   }
   mostrarLogin(true);
 })();
