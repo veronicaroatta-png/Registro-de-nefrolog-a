@@ -503,7 +503,7 @@ function _modalConfirm(titulo, mensaje) {
 function getToken() { return sessionStorage.getItem('nefroToken') || ''; }
 function getUser()  { return sessionStorage.getItem('nefroUser') || ''; }
 function getRole()  { return sessionStorage.getItem('nefroRole') || ''; }
-function authHdr()  { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }; }
+function authHdr()  { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken(), 'X-User': getUser() }; }
 
 function mostrarLogin(visible) {
   document.getElementById('login-overlay').style.display = visible ? 'flex' : 'none';
@@ -550,10 +550,10 @@ async function intentarLogin() {
   try {
     // TOKEN: por ahora usamos user:pass (compatible con Worker actual).
     // Cuando actualices el Worker, reemplazá las 2 líneas marcadas con [FASE-2]
-    const rawToken = user + ':' + pass;           // [FASE-2] → await _derivarTokenOpaco(user, pass)
+    const rawToken = await _derivarTokenOpaco(user, pass);  // [FASE-2] activado
     sessionStorage.setItem('nefroToken', rawToken);
     sessionStorage.setItem('nefroUser', user);
-    const r = await fetch(WORKER_URL + '?action=whoami', { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + rawToken } });
+    const r = await fetch(WORKER_URL + '?action=whoami', { headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + rawToken, 'X-User': user } });
     if (r.status === 401) {
       sessionStorage.removeItem('nefroToken');
       sessionStorage.removeItem('nefroUser');
