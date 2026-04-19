@@ -967,7 +967,7 @@ document.getElementById('main-form').addEventListener('submit', async function (
     'PTH (pg/mL)':           getVal('pth'),
     'Biopsia':               getRadio('biopsia'),
     'Resultado biopsia':     document.getElementById('biopsia-resultado-group').classList.contains('active') ? getVal('biopsia-resultado') : '',
-    'Año biopsia':           document.getElementById('biopsia-anio-group') && document.getElementById('biopsia-anio-group').style.pointerEvents !== 'none' ? getVal('biopsia-anio') : '',
+    'Año biopsia':(document.getElementById('biopsia-anio-group')&&document.getElementById('biopsia-anio-group').style.pointerEvents!=='none'&&getVal('biopsia-anio'))?parseInt(getVal('biopsia-anio')):null,
     'AKI/AKD':               getRadio('aki'),
     'Diálisis':              getRadio('dialisis'),
     'Internación':           getRadio('internacion'),
