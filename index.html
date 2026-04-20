@@ -245,7 +245,7 @@
   <button type="button" class="btn btn-pdf" onclick="abrirPDFdesdeHC()" style="padding:9px 18px;font-size:0.84rem;">📄 PDF resumen</button>
 </div>
 <form id="main-form" autocomplete="off">
-<!-- BÚSQUEDA RÁPIDA POR HC --><!-- 1. Identificación --> <div class="section"> <div class="section-header"><span class="num">1</span><h2>Identificación del Paciente</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="hc">N° Historia Clínica</label> <input type="text" id="hc" placeholder="Ej: 00123456" required=""> </div> <div class="field-group"> <label for="edad">Edad (años)</label> <input type="number" id="edad" min="0" max="120" placeholder="Ej: 65" required=""> </div> <div class="field-group"> <label for="sexo">Sexo biológico</label> <select id="sexo" required=""> <option value="">— Seleccionar —</option> <option value="Masculino">Masculino</option> <option value="Femenino">Femenino</option> </select> </div> <div class="field-group"> <label for="fecha">Fecha de consulta</label> <input type="date" id="fecha" required=""> </div> <div class="field-group"> <label for="hospital">Hospital</label> <select id="hospital"> <option value="">— Seleccionar —</option> <option value="Ramos Mejía">Ramos Mejía</option> <option value="Favaloro">Favaloro</option> <option value="Hospital Alemán">Hospital Alemán</option> </select> </div> <div class="field-group"> <label for="cobertura">Cobertura</label> <select id="cobertura"> <option value="">— Seleccionar —</option> <option value="No">No</option> <option value="Obra Social">Obra Social</option> <option value="Prepaga">Prepaga</option> </select> </div> </div> </div> </div> <!-- 2. Motivo --> <div class="section"> <div class="section-header"><span class="num">2</span><h2>Motivo de Consulta</h2></div> <div class="section-body"> <label for="motivo">Descripción libre</label> <textarea id="motivo" placeholder="Describir el motivo de consulta..."></textarea> </div> </div> <!-- 3. Antecedentes --> <div class="section"> <div class="section-header"><span class="num">3</span><h2>Antecedentes</h2></div> <div class="section-body"> <div class="checks-grid"> <label class="check-item"> <input type="checkbox" id="erc" value="1"> <span class="check-box"></span> <span class="check-label">Enfermedad Renal Crónica</span> </label> <label class="check-item"> <input type="checkbox" id="coronaria" value="1"> <span class="check-box"></span> <span class="check-label">Enfermedad Coronaria</span> </label> <label class="check-item"> <input type="checkbox" id="ic" value="1"> <span class="check-box"></span> <span class="check-label">Insuficiencia Cardíaca</span> </label> <label class="check-item"> <input type="checkbox" id="hta" value="1"> <span class="check-box"></span> <span class="check-label">HTA</span> </label> <label class="check-item"> <input type="checkbox" id="tabaquismo" value="1"> <span class="check-box"></span> <span class="check-label">Tabaquismo</span> </label> <label class="check-item"> <input type="checkbox" id="evp" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Vascular Periférica</span> </label> <label class="check-item"> <input type="checkbox" id="dbt" value="1"> <span class="check-box"></span> <span class="check-label">Diabetes</span> </label> <label class="check-item"> <input type="checkbox" id="oncologica" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Oncológica</span> </label> <label class="check-item"> <input type="checkbox" id="autoinmune" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Autoinmune</span> </label> <label class="check-item"> <input type="checkbox" id="litiasis" value="1"> <span class="check-box"></span> <span class="check-label">Litiasis Renal</span> </label> <label class="check-item"> <input type="checkbox" id="itu" value="1"> <span class="check-box"></span> <span class="check-label">ITU a Repetición</span> </label> <label class="check-item"> <input type="checkbox" id="hiv" value="1"> <span class="check-box"></span> <span class="check-label">HIV</span> </label> <label class="check-item"> <input type="checkbox" id="evento-cv" value="1"> <span class="check-box"></span> <span class="check-label">Evento CV (IAM/ACV)</span> </label> <label class="check-item"> <input type="checkbox" id="monorreno" value="1"> <span class="check-box"></span> <span class="check-label">Monorreno</span> </label> <label class="check-item"> <input type="checkbox" id="dislipemia" value="1"> <span class="check-box"></span> <span class="check-label">Dislipemia (DLP)</span> </label> <label class="check-item"> <input type="checkbox" id="poliquistosis" value="1"> <span class="check-box"></span> <span class="check-label">Poliquistosis Renal</span> </label> <label class="check-item"> <input type="checkbox" id="aines" value="1"> <span class="check-box"></span> <span class="check-label">AINEs / Nefrotóxico</span> </label> <label class="check-item"> <input type="checkbox" id="uropatia" value="1"> <span class="check-box"></span> <span class="check-label">Uropatía Obstructiva</span> </label> <label class="check-item"> <input type="checkbox" id="aki-previo" value="1"> <span class="check-box"></span> <span class="check-label">AKI Previo</span> </label> <label class="check-item"> <input type="checkbox" id="glomerulopatia" value="1"> <span class="check-box"></span> <span class="check-label">Glomerulopatía</span> </label> </div> <!-- ERC campos adicionales — solo visibles si ERC está tildado --> <div class="erc-conditional" id="erc-extra-group"> <div class="erc-extra"> <div class="field-group"> <label>Estadio ERC (KDIGO)</label> <div id="estadio-erc-display">— Ingresá el FGe en Laboratorio —</div> <p class="help-text">Se actualiza automáticamente con el FGe calculado.</p> </div> <div class="field-group"> <label for="tiempo-erc">Tiempo de evolución de ERC</label> <input type="number" id="tiempo-erc" min="0" step="0.5" placeholder="Años (Ej: 3.5)"> <label class="tiempo-unknown"> <input type="checkbox" id="tiempo-desconocido" onchange="toggleTiempoERC()"> <span>Tiempo desconocido (se guardará como dato faltante)</span> </label> </div> </div> </div> </div> </div> <!-- 4. Examen Físico --> <div class="section"> <div class="section-header"><span class="num">4</span><h2>Examen Físico</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="tas">T.A. Sistólica (mmHg)</label> <input type="number" id="tas" min="50" max="300" placeholder="Ej: 130"> </div> <div class="field-group"> <label for="tad">T.A. Diastólica (mmHg)</label> <input type="number" id="tad" min="30" max="200" placeholder="Ej: 80"> </div> <div class="field-group"> <label>Edemas</label> <div class="radio-group"> <label class="radio-item"> <input type="radio" name="edemas" value="Sí"> <span class="radio-dot"></span><span>Sí</span> </label> <label class="radio-item"> <input type="radio" name="edemas" value="No" checked=""> <span class="radio-dot"></span><span>No</span> </label> </div> </div> <div class="field-group"> <label for="peso">Peso (kg)</label> <input type="number" id="peso" min="20" max="300" step="0.1" placeholder="Ej: 82.5"> </div> <div class="field-group"> <label for="talla">Talla (cm)</label> <input type="number" id="talla" min="100" max="220" step="0.5" placeholder="Ej: 168"> </div> <div class="field-group"> <label for="imc">IMC (kg/m2)</label> <input type="text" id="imc" class="calculated" readonly="" placeholder="Calculado automáticamente"> <div class="fge-badge" id="imc-badge"></div> </div> </div> </div> </div> <!-- 5. Laboratorio --> <div class="section"> <div class="section-header"><span class="num">5</span><h2>Laboratorio</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="urea">Urea (mg/dL)</label> <input type="number" id="urea" min="0" step="0.1" placeholder="Ej: 42.0"> </div> <div class="field-group"> <label for="creatinina">Creatinina (mg/dL)</label> <input type="number" id="creatinina" min="0" step="0.01" placeholder="Ej: 1.20"> </div> <div class="field-group"> <label for="fge">FGe CKD-EPI (mL/min/1.73m2)</label> <input type="text" id="fge" class="calculated" readonly="" placeholder="Calculado automáticamente"> <div class="fge-badge" id="fge-badge"></div> </div> <div class="field-group"> <label for="proteinuria">Proteinuria (mg/24 hs)</label> <input type="number" id="proteinuria" min="0" step="1" placeholder="Ej: 450"> </div> <div class="field-group"> <label for="albuminuria">Albuminuria (mg/24 hs)</label> <input type="number" id="albuminuria" min="0" step="1" placeholder="Ej: 180"> <div class="fge-badge" id="alb-badge"></div> </div> <div class="field-group"> <label for="hb">Hemoglobina (g/dL)</label> <input type="number" id="hb" min="0" step="0.1" placeholder="Ej: 11.5"> </div> <div class="field-group"> <label for="potasio">Potasio (mEq/L)</label> <input type="number" id="potasio" min="0" step="0.1" placeholder="Ej: 4.8"> </div> <div class="field-group"> <label for="pth">PTH (pg/mL)</label> <input type="number" id="pth" min="0" step="0.1" placeholder="Ej: 120.0"> </div> <div class="field-group"> <label for="hco3">Bicarbonato HCO₃ (mEq/L)</label> <input type="number" id="hco3" min="0" step="0.1" placeholder="Ej: 22.0"> </div> <div class="field-group"> <label for="acido-urico">Ácido Úrico (mg/dL)</label> <input type="number" id="acido-urico" min="0" step="0.1" placeholder="Ej: 7.2"> </div> <div class="field-group"> <label for="ferritina">Ferritina (ng/mL)</label> <input type="number" id="ferritina" min="0" step="0.1" placeholder="Ej: 250.0"> </div> <div class="field-group"> <label for="ldl">Colesterol LDL (mg/dL)</label> <input type="number" id="ldl" min="0" step="0.1" placeholder="Ej: 110.0"> </div> <div class="field-group"> <label for="calcio">Calcio (mg/dL)</label> <input type="number" id="calcio" min="0" step="0.01" placeholder="Ej: 9.2"> </div> <div class="field-group"> <label for="fosforo">Fósforo (mg/dL)</label> <input type="number" id="fosforo" min="0" step="0.01" placeholder="Ej: 4.1"> </div> <div class="field-group"> <label for="glucemia">Glucemia (mg/dL)</label> <input type="number" id="glucemia" min="0" step="0.1" placeholder="Ej: 98.0"> </div> <div class="field-group"> <label for="hba1c">HbA1c (%)</label> <input type="number" id="hba1c" min="0" step="0.1" placeholder="Ej: 7.2"> </div> <div class="field-group"> <label for="sodio">Sodio (mEq/L)</label> <input type="number" id="sodio" min="0" step="0.1" placeholder="Ej: 140.0"> </div> <div class="field-group"> <label for="cloro">Cloro (mEq/L)</label> <input type="number" id="cloro" min="0" step="0.1" placeholder="Ej: 104.0"> </div> </div> <p class="help-text" style="margin-top:16px">* FGe calculado con CKD-EPI 2021 a partir de creatinina, edad y sexo.</p> </div> </div> <!-- 6. Estudios complementarios --> <div class="section"> <div class="section-header"><span class="num">6</span><h2>Otros Exámenes Complementarios</h2></div> <div class="section-body"> <div class="grid-2"> <div class="field-group"> <label>Biopsia renal</label> <div class="radio-group"> <label class="radio-item"> <input type="radio" name="biopsia" value="Sí" id="biopsia-si"> <span class="radio-dot"></span><span>Sí</span> </label> <label class="radio-item"> <input type="radio" name="biopsia" value="No" id="biopsia-no" checked=""> <span class="radio-dot"></span><span>No</span> </label> </div> </div> <div class="field-group" id="biopsia-resultado-group"> <label for="biopsia-resultado">Resultado de biopsia renal</label> <input type="text" id="biopsia-resultado" placeholder="Ej: Nefropatía por IgA, GSFS..."> </div> <div class="field-group" id="biopsia-anio-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;"> <label for="biopsia-anio">Año de la biopsia renal</label> <input type="number" id="biopsia-anio" min="1950" max="2100" placeholder="Ej: 2023"> <p class="help-text">Año con 4 dígitos (ej: 2023).</p> </div> </div> </div> </div> <!-- 7. Outcome --> <div class="section"> <div class="section-header"><span class="num">7</span><h2>Outcome / Evolución</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label>AKI / AKD</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="aki" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="aki" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group" id="aki-causal-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;grid-column:1/-1;"> <label for="aki-causal">Causa Sospechada de AKI/AKD</label> <input type="text" id="aki-causal" placeholder="Ej: prerrenal por deshidratación, nefrotóxico (AINE), obstructivo..."> </div> <div class="field-group"> <label>Requerimiento de diálisis</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="dialisis" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="dialisis" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>Internación</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="internacion" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="internacion" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>MACE</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="mace" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="mace" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> <p class="help-text" style="margin-top:6px">Tildar si el paciente presentó IAM, ACV o revascularización durante el seguimiento.</p> </div> <div class="field-group"> <label>Óbito (Muerte)</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="obito" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="obito" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>Infección</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="infeccion" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="infeccion" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> <p class="help-text" style="margin-top:6px">Cualquier infección que haya requerido consulta o tratamiento.</p> </div> <div class="field-group" id="fecha-dialisis-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;"> <label for="fecha-dialisis">Fecha de Inicio de Diálisis</label> <input type="date" id="fecha-dialisis"> <p class="help-text" style="margin-top:4px">Se habilita al seleccionar diálisis Sí.</p> </div> </div> </div> </div> <!-- 8. Medicación --> <div class="section"> <div class="section-header"><span class="num">8</span><h2>Medicación</h2></div> <div class="section-body"> <div class="checks-grid"> <label class="check-item"> <input type="checkbox" id="ieca" value="1"> <span class="check-box"></span> <span class="check-label">IECA / ARA II</span> </label> <label class="check-item"> <input type="checkbox" id="bb" value="1"> <span class="check-box"></span> <span class="check-label">BB (Betabloqueantes)</span> </label> <label class="check-item"> <input type="checkbox" id="isglt2" value="1"> <span class="check-box"></span> <span class="check-label">iSGLT2</span> </label> <label class="check-item"> <input type="checkbox" id="mra" value="1"> <span class="check-box"></span> <span class="check-label">MRA</span> </label> <label class="check-item"> <input type="checkbox" id="inmunosupresion" value="1"> <span class="check-box"></span> <span class="check-label">Inmunosupresión</span> </label> <label class="check-item"> <input type="checkbox" id="epo" value="1"> <span class="check-box"></span> <span class="check-label">Uso de EPO</span> </label> <label class="check-item"> <input type="checkbox" id="glp1" value="1"> <span class="check-box"></span> <span class="check-label">GLP-1</span> </label> <label class="check-item"> <input type="checkbox" id="med_obesidad" value="1"> <span class="check-box"></span> <span class="check-label">Medicación Obesidad</span> </label> <label class="check-item"> <input type="checkbox" id="estatinas" value="1"> <span class="check-box"></span> <span class="check-label">Estatinas</span> </label> <label class="check-item"> <input type="checkbox" id="diureticos" value="1"> <span class="check-box"></span> <span class="check-label">Diuréticos (Asa/Tiazidas)</span> </label> <label class="check-item"> <input type="checkbox" id="aas" value="1"> <span class="check-box"></span> <span class="check-label">Aspirina (AAS) / Antiagregantes</span> </label> <label class="check-item"> <input type="checkbox" id="quelantes" value="1"> <span class="check-box"></span> <span class="check-label">Quelantes de Fósforo / Vit. D</span> </label> </div> <div class="field-group" style="margin-top:16px;"> <label for="otros-tratamientos">Otros tratamientos</label> <textarea id="otros-tratamientos" placeholder="Describí libremente cualquier medicamento u otro tratamiento que no esté en las categorías anteriores..."></textarea> </div> </div> </div> <!-- 9. KFRE — Riesgo de Progresión ERC --> <div class="section kfre-section" id="kfre-section"> <div class="section-header kfre-section-header"> <span class="num kfre-num">9</span> <h2>Riesgo de Progresión ERC — Score KFRE</h2> </div> <div class="section-body"> <div class="kfre-input-panel"> <label>Variables utilizadas para el cálculo</label> <div class="kfre-vars-summary" id="kfre-vars-summary"> — Completá edad, sexo, creatinina y albuminuria (Sección 5) para ver el score — </div> <p class="help-text" style="margin-top:5px;"> Calculado con: <strong>Edad · Sexo · FGe CKD-EPI · Albuminuria 24h</strong> — la albuminuria mg/24h se usa como proxy del ACR (asume creatinuria urinaria ~1 g/día). </p> </div> <div class="kfre-display"> <div class="kfre-display-header"> 📊 Score KFRE — Riesgo de Progresión a Falla Renal Terminal </div> <div id="kfre-content"> <div class="kfre-pending-msg"> Ingresá la albuminuria (Sección 5) y completá edad, sexo y creatinina para calcular el riesgo KFRE automáticamente. </div> </div> </div> <p class="help-text" style="margin-top:14px; line-height:1.6;"> * <strong>KFRE 4 variables</strong> (Tangri N et al., <em>JAMA</em> 2011; validación multinacional <em>JAMA</em> 2016). Indicado para ERC estadios G3–G5 (FGe 15–59 mL/min/1.73m²). La albuminuria de orina de 24h (mg/24h) se usa como proxy del ACR (mg/g); la equivalencia asume creatinuria urinaria ~1 g/día. El resultado es orientativo y debe interpretarse en contexto clínico completo. </p> </div> </div> <div class="actions"> <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">↺ Limpiar</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-panel&#39;).style.display=document.getElementById(&#39;autocarga-panel&#39;).style.display===&#39;none&#39;?&#39;block&#39;:&#39;none&#39;" title="Pegar datos de paciente en texto libre para autocompletar el formulario">⚡ Autocarga IA</button> <button type="submit" class="btn btn-primary">+ Guardar Registro</button> </div> <!-- PANEL AUTOCARGA --> <div id="autocarga-panel" style="display:none; margin-top:20px; background:#eaf4fb; border:1.5px solid #aed6f1; border-radius:4px; padding:20px;"> <div style="font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#1a5276; margin-bottom:10px;">⚡ Autocarga desde texto clínico</div> <p style="font-size:0.82rem; color:#555; margin-bottom:10px;">Pegá acá el JSON que te generó Claude con los datos del paciente y el formulario se completará automáticamente.</p> <textarea id="autocarga-input" style="width:100%; min-height:120px; font-size:0.82rem; font-family:monospace; border:1.5px solid #aed6f1; border-radius:3px; padding:10px;" placeholder="{&quot;hc&quot;:&quot;123456&quot;,&quot;edad&quot;:&quot;65&quot;,&quot;sexo&quot;:&quot;Masculino&quot;,&quot;fecha&quot;:&quot;2026-03-13&quot;,&quot;hospital&quot;:&quot;Ramos Mejía&quot;,&quot;cobertura&quot;:&quot;Obra Social&quot;,&quot;motivo&quot;:&quot;Control ERC&quot;,&quot;erc&quot;:true,&quot;hta&quot;:true,&quot;creatinina&quot;:&quot;2.1&quot;,&quot;acr&quot;:&quot;180&quot;,...}"></textarea> <div style="display:flex; gap:10px; margin-top:10px;"> <button type="button" class="btn btn-primary" onclick="autocargaDesdeJSON()" style="padding:9px 20px; font-size:0.82rem;">✓ Autocompletar formulario</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-input&#39;).value=&#39;&#39;; document.getElementById(&#39;autocarga-panel&#39;).style.display=&#39;none&#39;" style="padding:9px 20px; font-size:0.82rem;">Cancelar</button> </div> <div id="autocarga-msg" style="margin-top:8px; font-size:0.8rem;"></div> </div></form><!-- SEGUIMIENTO LONGITUDINAL -->
+<!-- BÚSQUEDA RÁPIDA POR HC --><!-- 1. Identificación --> <div class="section"> <div class="section-header"><span class="num">1</span><h2>Identificación del Paciente</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="hc">N° Historia Clínica</label> <input type="text" id="hc" placeholder="Ej: 00123456" required=""> </div> <div class="field-group"> <label for="edad">Edad (años)</label> <input type="number" id="edad" min="0" max="120" placeholder="Ej: 65" required=""> </div> <div class="field-group"> <label for="sexo">Sexo biológico</label> <select id="sexo" required=""> <option value="">— Seleccionar —</option> <option value="Masculino">Masculino</option> <option value="Femenino">Femenino</option> </select> </div> <div class="field-group"> <label for="fecha">Fecha de consulta</label> <input type="date" id="fecha" required=""> </div> <div class="field-group"> <label for="hospital">Hospital</label> <select id="hospital"> <option value="">— Seleccionar —</option> <option value="Ramos Mejía">Ramos Mejía</option> <option value="Favaloro">Favaloro</option> <option value="Hospital Alemán">Hospital Alemán</option> </select> </div> <div class="field-group"> <label for="cobertura">Cobertura</label> <select id="cobertura"> <option value="">— Seleccionar —</option> <option value="No">No</option> <option value="Obra Social">Obra Social</option> <option value="Prepaga">Prepaga</option> </select> </div> </div> </div> </div> <!-- 2. Motivo --> <div class="section"> <div class="section-header"><span class="num">2</span><h2>Motivo de Consulta</h2></div> <div class="section-body"> <label for="motivo">Descripción libre</label> <textarea id="motivo" placeholder="Describir el motivo de consulta..."></textarea> </div> </div> <!-- 3. Antecedentes --> <div class="section"> <div class="section-header"><span class="num">3</span><h2>Antecedentes</h2></div> <div class="section-body"> <div class="checks-grid"> <label class="check-item"> <input type="checkbox" id="erc" value="1"> <span class="check-box"></span> <span class="check-label">Enfermedad Renal Crónica</span> </label> <label class="check-item"> <input type="checkbox" id="coronaria" value="1"> <span class="check-box"></span> <span class="check-label">Enfermedad Coronaria</span> </label> <label class="check-item"> <input type="checkbox" id="ic" value="1"> <span class="check-box"></span> <span class="check-label">Insuficiencia Cardíaca</span> </label> <label class="check-item"> <input type="checkbox" id="hta" value="1"> <span class="check-box"></span> <span class="check-label">HTA</span> </label> <label class="check-item"> <input type="checkbox" id="tabaquismo" value="1"> <span class="check-box"></span> <span class="check-label">Tabaquismo</span> </label> <label class="check-item"> <input type="checkbox" id="evp" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Vascular Periférica</span> </label> <label class="check-item"> <input type="checkbox" id="dbt" value="1"> <span class="check-box"></span> <span class="check-label">Diabetes</span> </label> <label class="check-item"> <input type="checkbox" id="oncologica" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Oncológica</span> </label> <label class="check-item"> <input type="checkbox" id="autoinmune" value="1"> <span class="check-box"></span> <span class="check-label">Enf. Autoinmune</span> </label> <label class="check-item"> <input type="checkbox" id="litiasis" value="1"> <span class="check-box"></span> <span class="check-label">Litiasis Renal</span> </label> <label class="check-item"> <input type="checkbox" id="itu" value="1"> <span class="check-box"></span> <span class="check-label">ITU a Repetición</span> </label> <label class="check-item"> <input type="checkbox" id="hiv" value="1"> <span class="check-box"></span> <span class="check-label">HIV</span> </label> <label class="check-item"> <input type="checkbox" id="evento-cv" value="1"> <span class="check-box"></span> <span class="check-label">Evento CV (IAM/ACV)</span> </label> <label class="check-item"> <input type="checkbox" id="monorreno" value="1"> <span class="check-box"></span> <span class="check-label">Monorreno</span> </label> <label class="check-item"> <input type="checkbox" id="dislipemia" value="1"> <span class="check-box"></span> <span class="check-label">Dislipemia (DLP)</span> </label> <label class="check-item"> <input type="checkbox" id="poliquistosis" value="1"> <span class="check-box"></span> <span class="check-label">Poliquistosis Renal</span> </label> <label class="check-item"> <input type="checkbox" id="aines" value="1"> <span class="check-box"></span> <span class="check-label">AINEs / Nefrotóxico</span> </label> <label class="check-item"> <input type="checkbox" id="uropatia" value="1"> <span class="check-box"></span> <span class="check-label">Uropatía Obstructiva</span> </label> <label class="check-item"> <input type="checkbox" id="aki-previo" value="1"> <span class="check-box"></span> <span class="check-label">AKI Previo</span> </label> <label class="check-item"> <input type="checkbox" id="glomerulopatia" value="1"> <span class="check-box"></span> <span class="check-label">Glomerulopatía</span> </label> </div> <!-- ERC campos adicionales — solo visibles si ERC está tildado --> <div class="erc-conditional" id="erc-extra-group"> <div class="erc-extra"> <div class="field-group"> <label>Estadio ERC (KDIGO)</label> <div id="estadio-erc-display">— Ingresá el FGe en Laboratorio —</div> <p class="help-text">Se actualiza automáticamente con el FGe calculado.</p> </div> <div class="field-group"> <label for="tiempo-erc">Tiempo de evolución de ERC</label> <input type="number" id="tiempo-erc" min="0" step="0.5" placeholder="Años (Ej: 3.5)"> <label class="tiempo-unknown"> <input type="checkbox" id="tiempo-desconocido" onchange="toggleTiempoERC()"> <span>Tiempo desconocido (se guardará como dato faltante)</span> </label> </div> </div> </div> </div> </div> <!-- 4. Examen Físico --> <div class="section"> <div class="section-header"><span class="num">4</span><h2>Examen Físico</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="tas">T.A. Sistólica (mmHg)</label> <input type="number" id="tas" min="50" max="300" placeholder="Ej: 130"> </div> <div class="field-group"> <label for="tad">T.A. Diastólica (mmHg)</label> <input type="number" id="tad" min="30" max="200" placeholder="Ej: 80"> </div> <div class="field-group"> <label>Edemas</label> <div class="radio-group"> <label class="radio-item"> <input type="radio" name="edemas" value="Sí"> <span class="radio-dot"></span><span>Sí</span> </label> <label class="radio-item"> <input type="radio" name="edemas" value="No" checked=""> <span class="radio-dot"></span><span>No</span> </label> </div> </div> <div class="field-group"> <label for="peso">Peso (kg)</label> <input type="number" id="peso" min="20" max="300" step="0.1" placeholder="Ej: 82.5"> </div> <div class="field-group"> <label for="talla">Talla (cm)</label> <input type="number" id="talla" min="100" max="220" step="0.5" placeholder="Ej: 168"> </div> <div class="field-group"> <label for="imc">IMC (kg/m2)</label> <input type="text" id="imc" class="calculated" readonly="" placeholder="Calculado automáticamente"> <div class="fge-badge" id="imc-badge"></div> </div> </div> </div> </div> <!-- 5. Laboratorio --> <div class="section"> <div class="section-header"><span class="num">5</span><h2>Laboratorio</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label for="urea">Urea (mg/dL)</label> <input type="number" id="urea" min="0" step="0.1" placeholder="Ej: 42.0"> </div> <div class="field-group"> <label for="creatinina">Creatinina (mg/dL)</label> <input type="number" id="creatinina" min="0" step="0.01" placeholder="Ej: 1.20"> </div> <div class="field-group"> <label for="fge">FGe CKD-EPI (mL/min/1.73m2)</label> <input type="text" id="fge" class="calculated" readonly="" placeholder="Calculado automáticamente"> <div class="fge-badge" id="fge-badge"></div> </div> <div class="field-group"> <label for="proteinuria">Proteinuria (mg/24 hs)</label> <input type="number" id="proteinuria" min="0" step="1" placeholder="Ej: 450"> </div> <div class="field-group"> <label for="albuminuria">Albuminuria (mg/24 hs)</label> <input type="number" id="albuminuria" min="0" step="1" placeholder="Ej: 180"> <div class="fge-badge" id="alb-badge"></div> </div> <div class="field-group"> <label for="hb">Hemoglobina (g/dL)</label> <input type="number" id="hb" min="0" step="0.1" placeholder="Ej: 11.5"> </div> <div class="field-group"> <label for="potasio">Potasio (mEq/L)</label> <input type="number" id="potasio" min="0" step="0.1" placeholder="Ej: 4.8"> </div> <div class="field-group"> <label for="pth">PTH (pg/mL)</label> <input type="number" id="pth" min="0" step="0.1" placeholder="Ej: 120.0"> </div> <div class="field-group"> <label for="hco3">Bicarbonato HCO₃ (mEq/L)</label> <input type="number" id="hco3" min="0" step="0.1" placeholder="Ej: 22.0"> </div> <div class="field-group"> <label for="acido-urico">Ácido Úrico (mg/dL)</label> <input type="number" id="acido-urico" min="0" step="0.1" placeholder="Ej: 7.2"> </div> <div class="field-group"> <label for="ferritina">Ferritina (ng/mL)</label> <input type="number" id="ferritina" min="0" step="0.1" placeholder="Ej: 250.0"> </div> <div class="field-group"> <label for="ldl">Colesterol LDL (mg/dL)</label> <input type="number" id="ldl" min="0" step="0.1" placeholder="Ej: 110.0"> </div> <div class="field-group"> <label for="calcio">Calcio (mg/dL)</label> <input type="number" id="calcio" min="0" step="0.01" placeholder="Ej: 9.2"> </div> <div class="field-group"> <label for="fosforo">Fósforo (mg/dL)</label> <input type="number" id="fosforo" min="0" step="0.01" placeholder="Ej: 4.1"> </div> <div class="field-group"> <label for="glucemia">Glucemia (mg/dL)</label> <input type="number" id="glucemia" min="0" step="0.1" placeholder="Ej: 98.0"> </div> <div class="field-group"> <label for="hba1c">HbA1c (%)</label> <input type="number" id="hba1c" min="0" step="0.1" placeholder="Ej: 7.2"> </div> <div class="field-group"> <label for="sodio">Sodio (mEq/L)</label> <input type="number" id="sodio" min="0" step="0.1" placeholder="Ej: 140.0"> </div> <div class="field-group"> <label for="cloro">Cloro (mEq/L)</label> <input type="number" id="cloro" min="0" step="0.1" placeholder="Ej: 104.0"> </div> </div> <p class="help-text" style="margin-top:16px">* FGe calculado con CKD-EPI 2021 a partir de creatinina, edad y sexo.</p> </div> </div> <!-- 6. Estudios complementarios --> <div class="section"> <div class="section-header"><span class="num">6</span><h2>Otros Exámenes Complementarios</h2></div> <div class="section-body"> <div class="grid-2"> <div class="field-group"> <label>Biopsia renal</label> <div class="radio-group"> <label class="radio-item"> <input type="radio" name="biopsia" value="Sí" id="biopsia-si"> <span class="radio-dot"></span><span>Sí</span> </label> <label class="radio-item"> <input type="radio" name="biopsia" value="No" id="biopsia-no" checked=""> <span class="radio-dot"></span><span>No</span> </label> </div> </div> <div class="field-group" id="biopsia-resultado-group"> <label for="biopsia-resultado">Resultado de biopsia renal</label> <input type="text" id="biopsia-resultado" placeholder="Ej: Nefropatía por IgA, GSFS..."> </div> <div class="field-group" id="biopsia-anio-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;"> <label for="biopsia-anio">Año de la biopsia renal</label> <input type="number" id="biopsia-anio" min="1950" max="2100" placeholder="Ej: 2023"> <p class="help-text">Año con 4 dígitos (ej: 2023).</p> </div> </div> </div> </div> <!-- 7. Outcome --> <div class="section"> <div class="section-header"><span class="num">7</span><h2>Outcome / Evolución</h2></div> <div class="section-body"> <div class="grid-3"> <div class="field-group"> <label>AKI / AKD</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="aki" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="aki" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group" id="aki-causal-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;grid-column:1/-1;"> <label for="aki-causal">Causa Sospechada de AKI/AKD</label> <input type="text" id="aki-causal" placeholder="Ej: prerrenal por deshidratación, nefrotóxico (AINE), obstructivo..."> </div> <div class="field-group"> <label>Requerimiento de diálisis</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="dialisis" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="dialisis" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>Internación</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="internacion" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="internacion" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>MACE</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="mace" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="mace" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> <p class="help-text" style="margin-top:6px">Tildar si el paciente presentó IAM, ACV o revascularización durante el seguimiento.</p> </div> <div class="field-group"> <label>Óbito (Muerte)</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="obito" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="obito" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> </div> <div class="field-group"> <label>Infección</label> <div class="radio-group"> <label class="radio-item"><input type="radio" name="infeccion" value="Sí"><span class="radio-dot"></span><span>Sí</span></label> <label class="radio-item"><input type="radio" name="infeccion" value="No" checked=""><span class="radio-dot"></span><span>No</span></label> </div> <p class="help-text" style="margin-top:6px">Cualquier infección que haya requerido consulta o tratamiento.</p> </div> <div class="field-group" id="fecha-dialisis-group" style="opacity:0.3;pointer-events:none;transition:opacity 0.25s;"> <label for="fecha-dialisis">Fecha de Inicio de Diálisis</label> <input type="date" id="fecha-dialisis"> <p class="help-text" style="margin-top:4px">Se habilita al seleccionar diálisis Sí.</p> </div> </div> </div> </div> <!-- 8. Medicación --> <div class="section"> <div class="section-header"><span class="num">8</span><h2>Medicación</h2></div> <div class="section-body"> <div class="checks-grid"> <label class="check-item"> <input type="checkbox" id="ieca" value="1"> <span class="check-box"></span> <span class="check-label">IECA / ARA II</span> </label> <label class="check-item"> <input type="checkbox" id="bb" value="1"> <span class="check-box"></span> <span class="check-label">BB (Betabloqueantes)</span> </label> <label class="check-item"> <input type="checkbox" id="isglt2" value="1"> <span class="check-box"></span> <span class="check-label">iSGLT2</span> </label> <label class="check-item"> <input type="checkbox" id="mra" value="1"> <span class="check-box"></span> <span class="check-label">MRA</span> </label> <label class="check-item"> <input type="checkbox" id="inmunosupresion" value="1"> <span class="check-box"></span> <span class="check-label">Inmunosupresión</span> </label> <label class="check-item"> <input type="checkbox" id="epo" value="1"> <span class="check-box"></span> <span class="check-label">Uso de EPO</span> </label> <label class="check-item"> <input type="checkbox" id="glp1" value="1"> <span class="check-box"></span> <span class="check-label">GLP-1</span> </label> <label class="check-item"> <input type="checkbox" id="med_obesidad" value="1"> <span class="check-box"></span> <span class="check-label">Medicación Obesidad</span> </label> <label class="check-item"> <input type="checkbox" id="estatinas" value="1"> <span class="check-box"></span> <span class="check-label">Estatinas</span> </label> <label class="check-item"> <input type="checkbox" id="diureticos" value="1"> <span class="check-box"></span> <span class="check-label">Diuréticos (Asa/Tiazidas)</span> </label> <label class="check-item"> <input type="checkbox" id="aas" value="1"> <span class="check-box"></span> <span class="check-label">Aspirina (AAS) / Antiagregantes</span> </label> <label class="check-item"> <input type="checkbox" id="quelantes" value="1"> <span class="check-box"></span> <span class="check-label">Quelantes de Fósforo / Vit. D</span> </label> </div> <div class="field-group" style="margin-top:16px;"> <label for="otros-tratamientos">Otros tratamientos</label> <textarea id="otros-tratamientos" placeholder="Describí libremente cualquier medicamento u otro tratamiento que no esté en las categorías anteriores..."></textarea> </div> </div> </div> <!-- 9. KFRE — Riesgo de Progresión ERC --> <div class="section kfre-section" id="kfre-section"> <div class="section-header kfre-section-header"> <span class="num kfre-num">9</span> <h2>Riesgo de Progresión ERC — Score KFRE</h2> </div> <div class="section-body"> <div class="kfre-input-panel"> <label>Variables utilizadas para el cálculo</label> <div class="kfre-vars-summary" id="kfre-vars-summary"> — Completá edad, sexo, creatinina y albuminuria (Sección 5) para ver el score — </div> <p class="help-text" style="margin-top:5px;"> Calculado con: <strong>Edad · Sexo · FGe CKD-EPI · Albuminuria 24h</strong> — la albuminuria mg/24h se usa como proxy del ACR (asume creatinuria urinaria ~1 g/día). </p> </div> <div class="kfre-display"> <div class="kfre-display-header"> 📊 Score KFRE — Riesgo de Progresión a Falla Renal Terminal </div> <div id="kfre-content"> <div class="kfre-pending-msg"> Ingresá la albuminuria (Sección 5) y completá edad, sexo y creatinina para calcular el riesgo KFRE automáticamente. </div> </div> </div> <p class="help-text" style="margin-top:14px; line-height:1.6;"> * <strong>KFRE 4 variables</strong> (Tangri N et al., <em>JAMA</em> 2011; validación multinacional <em>JAMA</em> 2016). Indicado para ERC estadios G3–G5 (FGe 15–59 mL/min/1.73m²). La albuminuria de orina de 24h (mg/24h) se usa como proxy del ACR (mg/g); la equivalencia asume creatinuria urinaria ~1 g/día. El resultado es orientativo y debe interpretarse en contexto clínico completo. </p> </div> </div> <div class="actions"> <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">↺ Limpiar</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-panel&#39;).style.display=document.getElementById(&#39;autocarga-panel&#39;).style.display===&#39;none&#39;?&#39;block&#39;:&#39;none&#39;" title="Pegar datos de paciente en texto libre para autocompletar el formulario">⚡ Autocarga IA</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-texto-panel&#39;).style.display=document.getElementById(&#39;autocarga-texto-panel&#39;).style.display===&#39;none&#39;?&#39;block&#39;:&#39;none&#39;" title="Pegar informe clínico en texto libre (lenguaje natural) para autocompletar el formulario">📝 Texto libre</button> <button type="submit" class="btn btn-primary">+ Guardar Registro</button> </div> <!-- PANEL AUTOCARGA --> <div id="autocarga-panel" style="display:none; margin-top:20px; background:#eaf4fb; border:1.5px solid #aed6f1; border-radius:4px; padding:20px;"> <div style="font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#1a5276; margin-bottom:10px;">⚡ Autocarga desde texto clínico</div> <p style="font-size:0.82rem; color:#555; margin-bottom:10px;">Pegá acá el JSON que te generó Claude con los datos del paciente y el formulario se completará automáticamente.</p> <textarea id="autocarga-input" style="width:100%; min-height:120px; font-size:0.82rem; font-family:monospace; border:1.5px solid #aed6f1; border-radius:3px; padding:10px;" placeholder="{&quot;hc&quot;:&quot;123456&quot;,&quot;edad&quot;:&quot;65&quot;,&quot;sexo&quot;:&quot;Masculino&quot;,&quot;fecha&quot;:&quot;2026-03-13&quot;,&quot;hospital&quot;:&quot;Ramos Mejía&quot;,&quot;cobertura&quot;:&quot;Obra Social&quot;,&quot;motivo&quot;:&quot;Control ERC&quot;,&quot;erc&quot;:true,&quot;hta&quot;:true,&quot;creatinina&quot;:&quot;2.1&quot;,&quot;acr&quot;:&quot;180&quot;,...}"></textarea> <div style="display:flex; gap:10px; margin-top:10px;"> <button type="button" class="btn btn-primary" onclick="autocargaDesdeJSON()" style="padding:9px 20px; font-size:0.82rem;">✓ Autocompletar formulario</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-input&#39;).value=&#39;&#39;; document.getElementById(&#39;autocarga-panel&#39;).style.display=&#39;none&#39;" style="padding:9px 20px; font-size:0.82rem;">Cancelar</button> </div> <div id="autocarga-msg" style="margin-top:8px; font-size:0.8rem;"></div> </div><div id="autocarga-texto-panel" style="display:none; margin-top:20px; background:#f4ecfb; border:1.5px solid #c9a3e8; border-radius:4px; padding:20px;"> <div style="font-size:0.8rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#5b2c87; margin-bottom:10px;">📝 Autocarga desde texto libre (informe clínico)</div> <p style="font-size:0.82rem; color:#555; margin-bottom:10px;">Pegá acá el informe del paciente en lenguaje natural (frases, resumen clínico, etc.) y el formulario intentará completarse automáticamente. A diferencia de la Autocarga IA, no necesitás generar JSON — el sistema interpreta el texto directamente. <strong>Revisá siempre los campos después de la autocarga.</strong></p> <textarea id="autocarga-texto-input" style="width:100%; min-height:140px; font-size:0.88rem; font-family:inherit; border:1.5px solid #c9a3e8; border-radius:3px; padding:10px;" placeholder="Ej: Paciente de 65 años, masculino, HC 00123456. HTA, diabetes tipo 2 de 10 años de evolución, tabaquista. TA 150/90, peso 82 kg, talla 170 cm. Creatinina 2.1 mg/dL, urea 72, HbA1c 7.8%, proteinuria 450 mg/24h. Toma enalapril, atorvastatina y dapagliflozina."></textarea> <div style="display:flex; gap:10px; margin-top:10px;"> <button type="button" class="btn btn-primary" onclick="autocargaDesdeTextoLibre()" style="padding:9px 20px; font-size:0.82rem; background:#5b2c87;">✓ Interpretar y autocompletar</button> <button type="button" class="btn btn-secondary" onclick="document.getElementById(&#39;autocarga-texto-input&#39;).value=&#39;&#39;; document.getElementById(&#39;autocarga-texto-panel&#39;).style.display=&#39;none&#39;" style="padding:9px 20px; font-size:0.82rem;">Cancelar</button> </div> <div id="autocarga-texto-msg" style="margin-top:8px; font-size:0.8rem;"></div> </div></form><!-- SEGUIMIENTO LONGITUDINAL -->
 <div id="seguimiento-section">
   <div class="section-header">
     <span class="num seg-num">📈</span>
@@ -1216,6 +1216,400 @@ function autocargaDesdeJSON() {
   document.getElementById('autocarga-panel').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
   mostrarToast('⚡ Formulario autocargado. Revisá y guardá.', 'success');
+}
+
+function autocargaDesdeTextoLibre() {
+  const input = document.getElementById('autocarga-texto-input');
+  const msgDiv = document.getElementById('autocarga-texto-msg');
+  const texto = input ? input.value : '';
+  if (!texto || texto.trim().length < 10) {
+    if (msgDiv) {
+      msgDiv.style.color = '#b03030';
+      msgDiv.textContent = '⚠ Pegá un texto clínico de al menos 10 caracteres.';
+    }
+    return;
+  }
+
+  function parseTextoLibre(texto) {
+    const out = {};
+    if (!texto || typeof texto !== 'string') return out;
+    const norm = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    function esNegado(textoNorm, matchIndex) {
+      const antes = textoNorm.substring(Math.max(0, matchIndex - 30), matchIndex);
+      return /\b(no\s+(?:toma|usa|recibe|presenta|presento|tiene|consume|fuma|desarrollo|desarrolla|tuvo|ha\s+tenido|ha\s+presentado)?\s*|sin\s+(?:tratamiento\s+con\s+|antecedentes?\s+de\s+)?|niega|nego|descarta|descartado|ausencia\s+de\s+|ausente)\s*$/.test(antes);
+    }
+
+    function detectar(patrones) {
+      for (const pat of patrones) {
+        const re = new RegExp('\\b' + pat + '\\b', 'gi');
+        let m;
+        while ((m = re.exec(norm)) !== null) {
+          if (!esNegado(norm, m.index)) return true;
+        }
+      }
+      return false;
+    }
+
+    function detectarNegado(patrones) {
+      for (const pat of patrones) {
+        const re = new RegExp('\\b' + pat + '\\b', 'gi');
+        let m;
+        while ((m = re.exec(norm)) !== null) {
+          if (esNegado(norm, m.index)) return true;
+        }
+      }
+      return false;
+    }
+
+    function extraerNumero(etiquetas, opciones) {
+      opciones = opciones || {};
+      for (const et of etiquetas) {
+        const re = new RegExp(et + '\\s*(?:[:=]|\\s+de|\\s+en)?\\s*([0-9]+(?:[.,][0-9]+)?)', 'i');
+        const m = norm.match(re);
+        if (m) {
+          let val = m[1].replace(',', '.');
+          const num = parseFloat(val);
+          if (!isNaN(num)) {
+            if (opciones.min !== undefined && num < opciones.min) continue;
+            if (opciones.max !== undefined && num > opciones.max) continue;
+            return opciones.entero ? String(Math.round(num)) : String(num);
+          }
+        }
+      }
+      return null;
+    }
+
+    const mHC = norm.match(/\b(?:hc|historia clinica|n[°º]?\s*hc|nro?\s*hc)\s*[:#nº°]*\s*([0-9]{3,12})/i);
+    if (mHC) out.hc = mHC[1];
+
+    const edad = extraerNumero(['edad'], { min: 0, max: 120, entero: true });
+    if (edad) out.edad = edad;
+    else {
+      const mE = norm.match(/\b(?:paciente|varon|mujer|hombre|sr\.?|sra\.?)\s+(?:de\s+)?([0-9]{1,3})\s*an(?:os|o)\b/);
+      if (mE) out.edad = mE[1];
+      else {
+        const mEa = norm.match(/\b([0-9]{1,3})\s*a\b/);
+        if (mEa) {
+          const n = parseInt(mEa[1]);
+          if (n >= 0 && n <= 120) out.edad = String(n);
+        }
+      }
+    }
+
+    if (/\b(?:masculino|masc|varon|hombre|sexo\s*m(?:asculino)?|sr\.)\b/.test(norm)) out.sexo = 'Masculino';
+    else if (/\b(?:femenino|fem|mujer|paciente\s+femenina|diabetica|hipertensa|sra\.?)\b/.test(norm)) out.sexo = 'Femenino';
+    else if (/(?:^|\n)\s*m\s*(?:$|\n|,|\s{2,})/.test(norm)) out.sexo = 'Masculino';
+    else if (/(?:^|\n)\s*f\s*(?:$|\n|,|\s{2,})/.test(norm)) out.sexo = 'Femenino';
+
+    if (/ramos\s*mej[ií]a/i.test(texto)) out.hospital = 'Ramos Mejía';
+    else if (/favaloro/i.test(texto)) out.hospital = 'Favaloro';
+    else if (/(?:hospital\s+)?alem[áa]n/i.test(texto)) out.hospital = 'Hospital Alemán';
+    else out.hospital = 'Ramos Mejía';
+
+    if (/\bsin\s*os\b|\bsin\s*cobertura\b|\bno\s*tiene\s*cobertura\b/i.test(norm)) out.cobertura = 'No';
+    else if (/\bprepaga\b|\bomint\b|\bgalen[oó]\b|\bosde\b|\bswiss\s*medical\b/i.test(texto)) out.cobertura = 'Prepaga';
+    else if (/\bobra\s*social\b|\biomac?\b|\bpami\b|\bosecac\b|\bos\b/i.test(texto)) out.cobertura = 'Obra Social';
+
+    const mMotivo = texto.match(/motivo\s*(?:de\s*consulta)?\s*[:\-]\s*([^\n\.]{5,200})/i);
+    if (mMotivo) out.motivo = mMotivo[1].trim();
+
+    if (detectar(['enfermedad\\s*renal\\s*cronica', 'erc', 'ifrc', 'insuficiencia\\s*renal\\s*cronica'])) out.erc = true;
+    if (detectar(['hta', 'hipertensi[oó]n\\s*arterial', 'hipertens[oa]', 'hipertensi[oó]n'])) out.hta = true;
+    if (detectar(['dbt', 'diabetes', 'dm2?', 'diabet[ia]c[oa]'])) out.dbt = true;
+    if (detectar(['dlp', 'dislipemia', 'dislipid[ea]mia', 'hipercolesterolemia'])) out.dislipemia = true;
+    if (detectar(['tabaquismo', 'tabaquista', 'fumador[a]?', 'fuma'])) out.tabaquismo = true;
+    if (detectarNegado(['tabaquismo', 'fumador[a]?', 'fuma'])) out.tabaquismo = false;
+    if (detectar(['coronariopatia', 'enfermedad\\s*coronaria', 'cardiopatia\\s*isquemica', 'antecedentes?\\s*coronari[oa]s?', 'coronari[oa]s?'])) out.coronaria = true;
+    if (detectar(['insuficiencia\\s*cardiaca', '\\bic\\b(?!\\w)', 'icc'])) out.ic = true;
+    if (detectar(['enfermedad\\s*vascular\\s*periferica', 'evp', 'arteriopatia\\s*periferica'])) out.evp = true;
+    if (detectar(['oncologic[oa]s?', 'cancer', 'neoplasi[ae]s?', 'tumor\\s*maligno'])) out.oncologica = true;
+    if (detectar(['autoinmune', 'lupus', 'les\\b', 'artritis\\s*reumatoide[a]?', 'vasculitis', '\\bar\\b', '\\bnl\\b', 'nefritis\\s*lupica', 'sjogren', 'esclerodermia', 'esclerosis\\s*sistemica', 'vasculitis\\s*anca'])) out.autoinmune = true;
+    if (detectar(['litiasis', 'calculos?\\s*renales?', 'nefrolitiasis'])) out.litiasis = true;
+    if (detectar(['itu\\s*a\\s*repetici[oó]n', 'itu\\s*recurrente', 'infecci[oó]n\\s*urinaria\\s*(?:recurrente|a\\s*repetici[oó]n)', 'infecciones?\\s*urinari[ao]s?\\s*a\\s*repetici[oó]n'])) out.itu = true;
+    if (detectar(['hiv', 'vih', 'sida'])) out.hiv = true;
+    if (detectar(['iam', 'infarto', 'acv', 'stroke', 'ictus', 'evento\\s*cerebrovascular'])) out['evento-cv'] = true;
+    if (detectar(['monorreno', 'rinon\\s*unico', 'un\\s*solo\\s*rinon'])) out.monorreno = true;
+    if (detectar(['poliquistosis', 'poliquistico[s]?', 'pkd', 'adpkd'])) out.poliquistosis = true;
+    if (detectar(['aines?\\b', 'nefrotoxic[oa]', 'antiinflamatorios?\\s*no\\s*esteroideos?'])) out.aines = true;
+    if (detectar(['uropatia\\s*obstructiva', 'obstruccion\\s*urinaria', 'hidronefrosis\\s*obstructiva'])) out.uropatia = true;
+    if (detectar(['aki\\s*previ[oa]', 'akin\\s*previ[oa]', 'ira\\s*previa', 'injuria\\s*renal\\s*aguda\\s*previa'])) out['aki-previo'] = true;
+    if (detectar(['glomerulopatia', 'glomerulonefritis', 'nefropatia\\s*por\\s*iga', 'gsfs', 'gnm', 'lupica', 'nefritis\\s*membranosa', 'membranosa', 'membranoproliferativa', 'gn\\s*c3', 'glomerulonefritis\\s*por\\s*c3', 'post\\s*infecciosa', 'post\\s*estreptococc?ica', 'niga', 'gammapatia\\s*monoclonal\\s*de\\s*significado\\s*renal', 'endocapilar', 'semilunas', 'extracapilar', 'cambios\\s*minimos', 'focal\\s*y\\s*segmentaria', 'gnfs'])) out.glomerulopatia = true;
+
+    const tas = extraerNumero(['ta\\s*sistolica', 'tas', 'presion\\s*sistolica'], { min: 50, max: 300, entero: true });
+    if (tas) out.tas = tas;
+    const tad = extraerNumero(['ta\\s*diastolica', 'tad', 'presion\\s*diastolica'], { min: 30, max: 200, entero: true });
+    if (tad) out.tad = tad;
+    const mTA = norm.match(/\bta\s*[:=]?\s*([0-9]{2,3})\s*[\/x]\s*([0-9]{2,3})\b/);
+    if (mTA && !out.tas) {
+      const ts = parseInt(mTA[1]), td = parseInt(mTA[2]);
+      if (ts >= 50 && ts <= 300) out.tas = String(ts);
+      if (td >= 30 && td <= 200) out.tad = String(td);
+    }
+    const idxEdema = norm.search(/\bedemas?\b/);
+    if (idxEdema !== -1 && !esNegado(norm, idxEdema)) out.edemas = 'Sí';
+    else if (detectarNegado(['edemas?'])) out.edemas = 'No';
+
+    const peso = extraerNumero(['peso'], { min: 20, max: 300 });
+    if (peso) out.peso = peso;
+    const talla = extraerNumero(['talla', 'altura'], { min: 100, max: 220 });
+    if (talla) out.talla = talla;
+
+    const urea = extraerNumero(['urea', '\\bu\\b'], { min: 0 });
+    if (urea) out.urea = urea;
+    const crea = extraerNumero(['creatininemia', 'creatinina\\s*(?:serica|plasmatica|en\\s*sangre)?', 'creat(?:inina)?', 'crea', 'cr'], { min: 0, max: 50 });
+    if (crea) out.creatinina = crea;
+    const prot = extraerNumero(['proteinuria', '\\bprot\\b'], { min: 0 });
+    if (prot) out.proteinuria = prot;
+    const alb = extraerNumero(['albuminuria', 'microalbuminuria', '\\bmau\\b', 'rac', 'cociente\\s*(?:de\\s*)?albumina[\\s\\/\\-]+creatinina', 'cociente\\s*a\\s*\\/\\s*c', 'alb\\s*\\/\\s*crea'], { min: 0 });
+    if (alb) out.albuminuria = alb;
+    const hb = extraerNumero(['hemoglobina(?!\\s*glic)', 'hb(?!1ac|a1c)'], { min: 0 });
+    if (hb) out.hb = hb;
+    const k = extraerNumero(['potasio', 'k\\+?'], { min: 0 });
+    if (k) out.potasio = k;
+    const pth = extraerNumero(['pth\\s*intacta', 'pth'], { min: 0 });
+    if (pth) out.pth = pth;
+    const hco3 = extraerNumero(['bicarbonato', 'hco3-?', 'hc0?3-?'], { min: 0 });
+    if (hco3) out.hco3 = hco3;
+    const au = extraerNumero(['acido\\s*urico', 'uricemia', '\\bau\\b'], { min: 0 });
+    if (au) out['acido-urico'] = au;
+    const fer = extraerNumero(['ferritina'], { min: 0 });
+    if (fer) out.ferritina = fer;
+    const ldl = extraerNumero(['ldl', 'colesterol\\s*ldl'], { min: 0 });
+    if (ldl) out.ldl = ldl;
+    const ca = extraerNumero(['calcemia', 'calcio', '\\bca\\b'], { min: 0 });
+    if (ca) out.calcio = ca;
+    const p = extraerNumero(['fosforo', 'fosfatemia', '\\bp\\b'], { min: 0 });
+    if (p) out.fosforo = p;
+    const glu = extraerNumero(['glucemia', 'glucosa', '\\bglu\\b'], { min: 0 });
+    if (glu) out.glucemia = glu;
+    const hba1c = extraerNumero(['hba1c', 'hb1ac', 'hemoglobina\\s*glicosilada', 'hemoglobina\\s*glicada'], { min: 0 });
+    if (hba1c) out.hba1c = hba1c;
+    const na = extraerNumero(['sodio', 'natremia', 'na\\+?'], { min: 0 });
+    if (na) out.sodio = na;
+    const cl = extraerNumero(['cloro', 'cloremia', '\\bcl\\b'], { min: 0 });
+    if (cl) out.cloro = cl;
+
+    (function() {
+      const nega = /\bsin\s*biopsia\b|\bno\s*(?:realiz[oa]|tiene|presenta|se\s*realiz[oa])\s*(?:bx|biopsia)\b|\bno\s*(?:bx|biopsia)\b/i;
+      if (nega.test(norm)) {
+        out.biopsia = 'No';
+        return;
+      }
+      const tieneBx = /\b(?:biopsia\s*renal|bx\s*renal|se\s*realiz[oa]\s*(?:una\s*)?(?:biopsia|bx)|tiene\s*(?:una\s*)?(?:biopsia|bx)|realizo\s*(?:una\s*)?(?:biopsia|bx))\b/i.test(norm) || /\bbx\b/i.test(norm);
+      if (!tieneBx) return;
+      out.biopsia = 'Sí';
+
+      let anio = null;
+      const mAnioTexto = texto.match(/\b\d{1,2}\s+de\s+[a-zñáéíóú]+\s+(?:de[l]?\s+)?(\d{4})\b/i);
+      if (mAnioTexto) anio = mAnioTexto[1];
+      if (!anio) {
+        const mAnioNum = texto.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-](\d{2,4})\b/);
+        if (mAnioNum) {
+          let y = parseInt(mAnioNum[1]);
+          if (y < 100) y += 2000;
+          if (y >= 1950 && y <= 2099) anio = String(y);
+        }
+      }
+      if (!anio) {
+        const m1 = texto.match(/(?:biopsia|bx)[^\n\.]{0,100}?\b(19[5-9]\d|20\d{2})\b/i);
+        const m2 = m1 ? null : texto.match(/\b(19[5-9]\d|20\d{2})\b[^\n\.]{0,60}?(?:biopsia|bx)/i);
+        if (m1) anio = m1[1];
+        else if (m2) anio = m2[1];
+      }
+      if (anio) out['biopsia-anio'] = anio;
+
+      const mRes = texto.match(/(?:biopsia\s*renal|bx\s*renal|bx)[\s:,\-]+([A-Za-zÁÉÍÓÚáéíóúñÑ][^\n\.]{3,120})/i);
+      if (mRes) {
+        let res = mRes[1].trim()
+          .replace(/^(con|resultado|informe|del?|en|:|-)\s*/i, '')
+          .replace(/\s+en\s+\d{4}.*$/i, '')
+          .replace(/\s+(?:el\s+)?\d{1,2}\s+de\s+[a-z]+\s+(?:del?\s+)?\d{4}.*$/i, '')
+          .replace(/\s+\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}.*$/i, '')
+          .replace(/^\d{1,2}\s+de\s+[a-z]+\s+(?:del?\s+)?\d{4}.*$/i, '')
+          .replace(/^renal\s*[:,\-]?\s*/i, '')
+          .trim();
+        if (res && res.length > 3 && !/^\d/.test(res)) out['biopsia-resultado'] = res;
+      }
+    })();
+
+    if (detectar(['\\baki\\b', 'injuria\\s*renal\\s*aguda', 'ira\\s*(?:oligurica|no\\s*oligurica)?'])) out.aki = 'Sí';
+    if (detectar(['dialisis', 'hemodialisis', 'requiri[oó]\\s*dialisis']) && !detectarNegado(['dialisis'])) {
+      out.dialisis = 'Sí';
+      const meses = { enero:1, febrero:2, marzo:3, abril:4, mayo:5, junio:6, julio:7, agosto:8, septiembre:9, setiembre:9, octubre:10, noviembre:11, diciembre:12 };
+      let fecha = null;
+      const reNum = /\b([0-9]{1,2})[\/\-]([0-9]{1,2})[\/\-]([0-9]{2,4})\b/g;
+      let mf;
+      while ((mf = reNum.exec(norm)) !== null) {
+        let d = parseInt(mf[1]), mo = parseInt(mf[2]), y = parseInt(mf[3]);
+        if (y < 100) y += 2000;
+        if (d >= 1 && d <= 31 && mo >= 1 && mo <= 12 && y >= 2000 && y <= 2099) {
+          fecha = y + '-' + String(mo).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          break;
+        }
+      }
+      if (!fecha) {
+        const reTxt = /\b([0-9]{1,2})\s+de\s+([a-zñ]+)(?:\s+(?:de|del)\s+)?(?:\s*)([0-9]{4})?\b/i;
+        const mt = norm.match(reTxt);
+        if (mt) {
+          const d = parseInt(mt[1]);
+          const mes = meses[mt[2]];
+          const y = mt[3] ? parseInt(mt[3]) : new Date().getFullYear();
+          if (mes && d >= 1 && d <= 31) {
+            fecha = y + '-' + String(mes).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          }
+        }
+      }
+      if (fecha) out['fecha-dialisis'] = fecha;
+    }
+    if (detectar(['internaci[oó]n', 'hospitalizaci[oó]n', 'internad[oa]'])) out.internacion = 'Sí';
+    (function() {
+      if (/\bmace\s*[:=]/i.test(norm) || /\bevento\s*cardiovascular\s*mayor\b/i.test(norm)) {
+        out.mace = 'Sí';
+        return;
+      }
+      const reTerm = /\b(iam|infarto(?:\s+agudo)?(?:\s+de\s+miocardio)?|acv|stroke|ictus)\b/gi;
+      let mm;
+      while ((mm = reTerm.exec(norm)) !== null) {
+        const antes = norm.substring(Math.max(0, mm.index - 80), mm.index);
+        const desp = norm.substring(mm.index + mm[0].length, Math.min(norm.length, mm.index + mm[0].length + 50));
+        const ctx = antes + ' ' + desp;
+        if (/\b(seguimiento|evolucion|presento|presenta|tuvo|sufrio|sufre|nuevo|post|durante|reciente|intercurrencia|intercurrente|episodio|cursa|cursando)\b/i.test(ctx)) {
+          out.mace = 'Sí';
+          return;
+        }
+      }
+    })();
+    if (detectar(['obito', 'fallecio', 'fallec[ei]', 'muerte\\s*del\\s*paciente'])) out.obito = 'Sí';
+    if (detectar(['infecci[oó]n(?:es)?\\w*', 'infeccios[oa]', 'sepsis', 'sept[iu]co', 'bacteriemia', 'bacteremia', 'itu', 'ivu', 'neumoni[ae]', 'endocarditis', 'bronquitis', 'pie\\s*diabetico', 'ippb', 'infeccion\\s*de\\s*piel\\s*(?:y\\s*partes\\s*blandas)?', 'absceso[s]?', 'abceso[s]?', 'celulitis', 'faringitis', 'gastroenteritis', 'meningitis', 'osteomielitis', 'colecistitis', 'prostatitis', 'pielonefritis', 'infeccion\\s*asociada\\s*a\\s*cateter'])) out.infeccion = 'Sí';
+
+    if (detectar(['ieca', 'ara\\s*ii', 'enalapril', 'losartan', 'valsart[aá]n', 'telmisart[aá]n'])) out.ieca = true;
+    if (detectarNegado(['ieca', 'ara\\s*ii'])) out.ieca = false;
+    if (detectar(['betabloqueante', 'bisoprolol', 'carvedilol', 'atenolol', 'nebivolol'])) out.bb = true;
+    if (detectar(['isglt2', 'sglt2', 'dapagliflozina', 'empagliflozina', 'canagliflozina', 'ertugliflozina', 'dapa', 'empa'])) out.isglt2 = true;
+    if (detectar(['\\bmra\\b', 'espironolactona', 'eplerenona', 'finerenona', 'espiro'])) out.mra = true;
+    if (detectar(['inmunosupresion', 'corticoides', 'prednisona', 'metilprednisolona', 'ciclofosfamida', 'micofenolato', 'tacrolimus', 'rituximab', 'sirolimus', 'everolimus', 'azatioprina', '\\baza\\b', 'meprednisona', 'mepredni', 'solumedrol', 'ciclofosfa', 'metotrexato', 'ciclosporina', 'belimumab', 'eculizumab', '\\bicn\\b', 'inhibidor\\s*(?:de\\s*(?:la\\s*)?)?calcineurina'])) out.inmunosupresion = true;
+    if (detectar(['\\bepo\\b', 'eritropoyetina', 'darbepoetina'])) out.epo = true;
+    if (detectar(['glp-?1', 'semaglutida', 'liraglutida', 'dulaglutida'])) out.glp1 = true;
+    if (detectar(['orlistat', 'medicacion\\s*(?:para\\s*la\\s*)?obesidad'])) out.med_obesidad = true;
+    if (detectar(['estatinas?', 'atorvastatina', 'rosuvastatina', 'simvastatina', 'pravastatina', 'atorva'])) out.estatinas = true;
+    if (detectarNegado(['estatinas?'])) out.estatinas = false;
+    if (detectar(['diureticos?', 'furosemida', 'hidroclorotiazida', 'torasemida', 'tiazid[ai]'])) out.diureticos = true;
+    if (detectar(['aspirina', '\\baas\\b', 'antiagregante', 'clopidogrel'])) out.aas = true;
+    if (detectar(['sevelamer', 'carbonato\\s*de\\s*calcio', 'quelante', 'calcitriol', 'vitamina\\s*d'])) out.quelantes = true;
+
+    const MEDS_CONOCIDAS = [
+      'enalapril','losartan','valsartan','telmisartan','ieca','ara',
+      'bisoprolol','carvedilol','atenolol','nebivolol','betabloqueante',
+      'dapa','empa','dapagliflozina','empagliflozina','canagliflozina','ertugliflozina','isglt2','sglt2',
+      'espironolactona','eplerenona','finerenona','espiro',
+      'atorvastatina','rosuvastatina','simvastatina','pravastatina','atorva','estatinas','estatina',
+      'furosemida','hidroclorotiazida','torasemida','tiazida','tiazidas','diureticos','diuretico',
+      'aspirina','aas','clopidogrel','antiagregante',
+      'sevelamer','calcitriol','quelantes','quelante',
+      'epo','eritropoyetina','darbepoetina',
+      'semaglutida','liraglutida','dulaglutida',
+      'orlistat',
+      'inmunosupresion','corticoides','prednisona','metilprednisolona','ciclofosfamida','micofenolato',
+      'tacrolimus','rituximab','sirolimus','everolimus','azatioprina','aza','meprednisona','mepredni',
+      'solumedrol','ciclofosfa','metotrexato','ciclosporina','belimumab','eculizumab','calcineurina'
+    ];
+    function _esMedConocida(token) {
+      const t = token.toLowerCase();
+      if (MEDS_CONOCIDAS.indexOf(t) !== -1) return true;
+      for (const med of MEDS_CONOCIDAS) {
+        if (med.length >= 4 && t.startsWith(med)) return true;
+        if (t.length >= 4 && med.startsWith(t)) return true;
+      }
+      return false;
+    }
+    const mSecMed = norm.match(/(?:mh|medicacion(?:\s+habitual)?|tratamiento|medicamentos?)\s*[:\-]\s*([^\n]+)/i);
+    if (mSecMed) {
+      const cortes = /(?:^|\s)(?:labo|lab|ta\b|antecedentes|mc|motivo|outcome|seguimiento|conducta|examen|ef\b|peso|talla|biopsia)\s*[:\-]/i;
+      const seccionLimpia = mSecMed[1].split(cortes)[0];
+      const tokens = seccionLimpia.split(/[,;]|\s+y\s+|\s+mas\s+/i)
+        .map(t => t.trim().replace(/^[+\-.]+|[+\-.]+$/g, ''))
+        .filter(t => t.length > 0);
+      const desconocidas = [];
+      for (const token of tokens) {
+        const primeraP = token.split(/\s+/)[0].toLowerCase();
+        if (!primeraP || primeraP.length < 3) continue;
+        if (!_esMedConocida(primeraP)) desconocidas.push(token);
+      }
+      if (desconocidas.length > 0) {
+        out['otros-tratamientos'] = desconocidas.join(', ');
+      }
+    }
+
+    return out;
+  }
+
+  let datos;
+  try {
+    datos = parseTextoLibre(texto);
+  } catch (err) {
+    if (msgDiv) {
+      msgDiv.style.color = '#b03030';
+      msgDiv.textContent = '⚠ Error al interpretar el texto: ' + err.message;
+    }
+    return;
+  }
+
+  const campos = Object.keys(datos);
+  if (campos.length === 0) {
+    if (msgDiv) {
+      msgDiv.style.color = '#b03030';
+      msgDiv.textContent = '⚠ No pude detectar ningún dato en el texto. Probá con más contexto clínico.';
+    }
+    return;
+  }
+
+  let completados = 0;
+  for (const [k, v] of Object.entries(datos)) {
+    try {
+      const el = document.getElementById(k);
+      if (el) {
+        if (el.type === 'checkbox') {
+          el.checked = Boolean(v);
+          completados++;
+        } else {
+          el.value = v;
+          completados++;
+        }
+        if (typeof el.dispatchEvent === 'function') {
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        continue;
+      }
+      const radios = document.getElementsByName(k);
+      if (radios && radios.length > 0) {
+        let marcado = false;
+        for (const r of radios) {
+          if (r.value === v) {
+            r.checked = true;
+            marcado = true;
+            if (typeof r.dispatchEvent === 'function') {
+              r.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            break;
+          }
+        }
+        if (marcado) completados++;
+      }
+    } catch (e) {
+    }
+  }
+
+  try { if (typeof calcularTodo === 'function') calcularTodo(); } catch (e) {}
+  try { if (typeof calcularFGe === 'function') calcularFGe(); } catch (e) {}
+  try { if (typeof calcularIMC === 'function') calcularIMC(); } catch (e) {}
+  try { if (typeof calcularKFRE === 'function') calcularKFRE(); } catch (e) {}
+
+  if (msgDiv) {
+    msgDiv.style.color = '#27632a';
+    msgDiv.textContent = '✓ Completé ' + completados + ' de ' + campos.length + ' campos detectados. Revisá el formulario antes de guardar.';
+  }
 }
 
 
