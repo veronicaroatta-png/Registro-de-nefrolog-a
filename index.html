@@ -1069,10 +1069,62 @@ async function exportarExcel() {
     if (r['N° HC']) r['N° HC'] = await decryptHC(r['N° HC']);
     return r;
   }));
-  const ws = XLSX.utils.json_to_sheet(dbExport);
+
+  // Orden fijo de columnas (mismo orden que el formulario)
+  const ORDEN_COLUMNAS = [
+    // 1. Identificación
+    'N° HC', 'Edad', 'Sexo', 'Fecha', 'Hospital', 'Cobertura',
+    // 2. Motivo
+    'Motivo',
+    // 3. Antecedentes
+    'ERC', 'Estadio ERC (KDIGO)', 'Tiempo ERC (años)',
+    'HTA', 'DBT', 'Tabaquismo', 'Dislipemia',
+    'E.Coronaria', 'IC', 'Evento CV (IAM/ACV)', 'Arritmia', 'EVP',
+    'Oncológica', 'Autoinmune', 'HIV',
+    'Litiasis', 'ITU', 'Monorreno', 'Poliquistosis',
+    'AINEs/Nefrotóxico', 'Uropatía Obstructiva',
+    'AKI Previo (Antec.)', 'Glomerulopatía (Antec.)',
+    'Tubulopatía', 'Hepatopatía', 'Mielomeningocele', 'Hiperuricemia',
+    // 4. Examen físico
+    'TAS (mmHg)', 'TAD (mmHg)', 'Edemas',
+    'Peso (kg)', 'Talla (cm)', 'IMC (kg/m2)', 'Categoría IMC',
+    // 5. Laboratorio
+    'Urea (mg/dL)', 'Creat (mg/dL)', 'FGe CKD-EPI',
+    'Proteinuria (mg/24h)', 'Albuminuria (mg/24h)', 'Albuminuria KDIGO',
+    'Hb (g/dL)', 'K (mEq/L)', 'PTH (pg/mL)', 'HCO3 (mEq/L)',
+    'Ácido Úrico (mg/dL)', 'Ferritina (ng/mL)', 'LDL (mg/dL)',
+    'Calcio (mg/dL)', 'Fósforo (mg/dL)',
+    'Glucemia (mg/dL)', 'HbA1c (%)',
+    'Sodio (mEq/L)', 'Cloro (mEq/L)',
+    // 6. Biopsia
+    'Biopsia', 'Resultado biopsia', 'Año biopsia',
+    // 7. Outcome
+    'AKI/AKD', 'AKI Causa Sospechada',
+    'Diálisis', 'Fecha Inicio Diálisis', 'Retiro Diálisis',
+    'Internación', 'Fecha Internación',
+    'Infección', 'MACE', 'Óbito',
+    // 8. Medicación
+    'IECA/ARAII', 'BB', 'iSGLT2', 'MRA',
+    'Diuréticos', 'Estatinas', 'AAS/Antiagregantes',
+    'Quelantes/Vit D', 'EPO', 'Allopurinol/Febuxostat',
+    'Inmunosupresión', 'Otros Tratamientos',
+    // 9. KFRE
+    'KFRE Riesgo 2a', 'KFRE Riesgo 5a', 'KFRE Categoría',
+    // 10. Metadatos de auditoría
+    '_Usuario', '_Timestamp',
+  ];
+
+  // Si Airtable tiene algún campo nuevo que no esté en la lista, lo agregamos al final
+  // para no perder información.
+  const clavesEnData = new Set();
+  dbExport.forEach(r => Object.keys(r).forEach(k => clavesEnData.add(k)));
+  const extra = [...clavesEnData].filter(k => !ORDEN_COLUMNAS.includes(k));
+  const headerFinal = [...ORDEN_COLUMNAS, ...extra];
+
+  const ws = XLSX.utils.json_to_sheet(dbExport, { header: headerFinal });
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pacientes');
-  ws['!cols'] = Object.keys(dbExport[0]).map(k => ({ wch: Math.max(k.length, 12) }));
+  ws['!cols'] = headerFinal.map(k => ({ wch: Math.max(k.length, 12) }));
   XLSX.writeFile(wb, `registro_nefrologia_${new Date().toISOString().slice(0, 10)}.xlsx`);
   mostrarToast('📥 Excel exportado correctamente.', 'success');
 }
