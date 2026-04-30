@@ -1048,7 +1048,7 @@ document.getElementById('main-form').addEventListener('submit', async function (
     'Eclampsia/Preeclampsia': getCheck('eclampsia'),
     'Vejiga Neurogénica':    getCheck('vejiga-neurogenica'),
     'HPB':                   getCheck('hpb'),
-    'Albúmina (g/dL)':       getVal('albumina') || null,
+    'Albúmina (g/dL)':       getVal('albumina') ? parseFloat(getVal('albumina').replace(',', '.')) : null,
     'Infección Cuál':        (getRadio('infeccion') === 'Sí') ? (getVal('infeccion-cual') || '') : '',
   };
 
