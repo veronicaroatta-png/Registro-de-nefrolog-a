@@ -1488,8 +1488,26 @@ function autocargaDesdeTextoLibre() {
     // HIV
     if (detectar(['hiv', 'vih', 'sida'])) out.hiv = true;
 
-    // Evento CV
-    if (detectar(['iam', 'infarto', 'acv', 'stroke', 'ictus', 'evento\\s*cerebrovascular'])) out['evento-cv'] = true;
+    // Evento CV (IAM/ACV) — SOLO se marca como antecedente histórico, NO como evento actual.
+    // Si "se internó por IAM", eso es MACE (evento actual), no antecedente.
+    // Para que sea antecedente, debe haber palabras como: antc/antecedente/previo/hace X años/en 20XX/post-IAM/secuela
+    (function() {
+      const reEvCV = /\b(iam|infarto(?:\s+agudo)?(?:\s+de\s+miocardio)?|acv|stroke|ictus|evento\s*cerebrovascular)\b/gi;
+      let mm;
+      while ((mm = reEvCV.exec(norm)) !== null) {
+        const antes = norm.substring(Math.max(0, mm.index - 60), mm.index);
+        const desp  = norm.substring(mm.index + mm[0].length, Math.min(norm.length, mm.index + mm[0].length + 40));
+        const ctx = antes + ' ' + desp;
+        // Marca evento-cv SOLO si hay contexto de antecedente histórico
+        const esAntecedente = /\b(antc|antecedente|antecedentes|previo|previa|hace\s+\d+\s+(?:anos?|meses?)|en\s+(?:el\s+)?(?:20\d{2}|19\d{2})|post[\s\-]*(?:iam|infarto|acv)|secuela|secuelas?\s*de|historia\s*de|hx\s*de|antiguo|viejo|cronico|cronica)\b/i.test(ctx);
+        // Marca como evento actual (NO antecedente) si hay contexto agudo
+        const esActual = /\b(intern[oóa]|internad[oa]|internaci[oó]n|hospitalizaci[oó]n|ingres[oó]|cursando|cursa|presento|presenta|tuvo|sufrio|sufre|nuevo|reciente|intercurrencia|intercurrente|episodio|durante|seguimiento|evolucion)\b/i.test(ctx);
+        if (esAntecedente && !esActual) {
+          out['evento-cv'] = true;
+          return;
+        }
+      }
+    })();
 
     // Monorreno: Nefrectomía, riñón único, agenesia renal, nefrectomizado
     if (detectar(['monorreno', 'rinon\\s*unico', 'un\\s*solo\\s*rinon', 'nefrectomia', 'nefrectomizad[oa]', 'agenesia\\s*renal'])) out.monorreno = true;
@@ -1714,7 +1732,41 @@ function autocargaDesdeTextoLibre() {
       if (detectar(['retiro\\s*de\\s*dialisis', 'suspensi[oó]n\\s*de\\s*dialisis', 'retir[oa]\\s*dialisis', 'suspendi[oó]\\s*dialisis', 'suspende\\s*dialisis'])) out['retiro-dialisis'] = 'Sí';
     }
 
-    if (detectar(['internaci[oó]n', 'hospitalizaci[oó]n', 'internad[oa]'])) out.internacion = 'Sí';
+    if (detectar(['internaci[oó]n', 'hospitalizaci[oó]n', 'internad[oa]', 'intern[oóa]', 'se\\s*intern[oóa]', 'requiri[oó]\\s*internaci[oó]n', 'ingres[oó]\\s*(?:a\\s*)?(?:hospital|sala|terapia|uti|uci|unidad)', 'ingres[oó]\\s*hospitalari[oa]', 'ingres[oó]\\s*(?:el|por|en|con|el?\\s+\\d)', 'ingres[oó]\\s*$'])) out.internacion = 'Sí';
+
+    // ─── FECHA DE INTERNACIÓN ───
+    // Si hay internación, busca una fecha cerca de las palabras "intern*" o "ingreso".
+    // Acepta formatos: 4/4/26, 04/04/2026, 4-4-26, 04.04.2026.
+    // Convierte a formato ISO YYYY-MM-DD que es el que necesita el campo type="date".
+    if (out.internacion === 'Sí') {
+      // Buscar en `norm` (sin tildes) porque \b no funciona bien con acentos.
+      // Las posiciones de norm coinciden con texto porque normalize('NFD') no cambia longitud.
+      const reIntern = /\b(intern\w*|ingreso|hospitaliza\w*)\b/gi;
+      let mIntern;
+      while ((mIntern = reIntern.exec(norm)) !== null) {
+        const desde = Math.max(0, mIntern.index - 50);
+        const hasta = Math.min(texto.length, mIntern.index + mIntern[0].length + 70);
+        const ventana = texto.substring(desde, hasta);
+        // Buscar fecha en formato D/M/YY, DD/MM/YYYY, D-M-YY, etc. (sin \b para tolerar pegado a "el")
+        const reFecha = /(?:^|[^\d])(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})(?!\d)/;
+        const mFecha = ventana.match(reFecha);
+        if (mFecha) {
+          let dia = parseInt(mFecha[1]);
+          let mes = parseInt(mFecha[2]);
+          let anio = parseInt(mFecha[3]);
+          // Validaciones básicas
+          if (dia < 1 || dia > 31 || mes < 1 || mes > 12) continue;
+          // Año de 2 dígitos → asumir 20XX (ej: 26 → 2026)
+          if (anio < 100) anio += 2000;
+          // Validación final: año razonable
+          if (anio < 1990 || anio > 2100) continue;
+          // Formato ISO YYYY-MM-DD con padding
+          const isoDate = anio + '-' + String(mes).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
+          out['fecha-internacion'] = isoDate;
+          break;
+        }
+      }
+    }
 
     (function() {
       if (/\bmace\s*[:=]/i.test(norm) || /\bevento\s*cardiovascular\s*mayor\b/i.test(norm)) {
@@ -1727,7 +1779,7 @@ function autocargaDesdeTextoLibre() {
         const antes = norm.substring(Math.max(0, mm.index - 80), mm.index);
         const desp = norm.substring(mm.index + mm[0].length, Math.min(norm.length, mm.index + mm[0].length + 50));
         const ctx = antes + ' ' + desp;
-        if (/\b(seguimiento|evolucion|presento|presenta|tuvo|sufrio|sufre|nuevo|post|durante|reciente|intercurrencia|intercurrente|episodio|cursa|cursando)\b/i.test(ctx)) {
+        if (/\b(seguimiento|evolucion|presento|presenta|tuvo|sufrio|sufre|nuevo|post|durante|reciente|intercurrencia|intercurrente|episodio|cursa|cursando|intern[oóa]|internad[oa]|internaci[oó]n|hospitalizaci[oó]n|ingres[oó]|requiri[oó]\s*internaci|por\s*(?:un\s*)?(?:nuevo\s*)?(?:iam|infarto|acv|stroke|ictus))\b/i.test(ctx)) {
           out.mace = 'Sí';
           return;
         }
