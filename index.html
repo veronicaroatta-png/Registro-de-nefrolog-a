@@ -1514,7 +1514,7 @@ function autocargaDesdeTextoLibre() {
     if (detectar(['tubulopatia', 'tubulopatias', 'sindrome\\s*de\\s*fanconi', 'acidosis\\s*tubular', 'sindrome\\s*de\\s*bartter', 'sindrome\\s*de\\s*gitelman', 'diabetes\\s*insipida\\s*nefrogenica'])) out.tubulopatia = true;
 
     // Hepatopatía
-    if (detectar(['hepatopatia', 'cirrosis', 'hepatopata', 'hepatitis\\s*cronica', 'cirrotic[oa]', 'enfermedad\\s*hepatica', 'insuficiencia\\s*hepatica'])) out.hepatopatia = true;
+    if (detectar(['hepatopatia', 'cirrosis', 'hepatopata', 'hepatitis\\s*cronica', 'cirrotic[oa]', 'enfermedad\\s*hepatica', 'insuficiencia\\s*hepatica', 'esteatosis', 'esteatohepatitis', 'higado\\s*graso', 'nafld', 'nash', 'masld'])) out.hepatopatia = true;
 
     // Mielomeningocele
     if (detectar(['mielomeningocele', 'espina\\s*bifida'])) out.mielomeningocele = true;
@@ -1524,6 +1524,16 @@ function autocargaDesdeTextoLibre() {
 
     // Hiperuricemia
     if (detectar(['hiperuricemia', 'gota', 'crisis\\s*gotosa', 'artritis\\s*gotosa', 'tofos'])) out.hiperuricemia = true;
+
+    // ─── ANTECEDENTES NUEVOS (abril 2026) ───
+    // Eclampsia / Preeclampsia: aceptar variantes con/sin guion/espacio y término clásico "gestosis"
+    if (detectar(['eclampsia', 'pre\\s*-?\\s*eclampsia', 'preeclampsia', 'gestosis', 'toxemia\\s*gravidica'])) out.eclampsia = true;
+
+    // Vejiga Neurogénica: aceptar acento o sin acento, abreviaturas "veg neurog" y "vej neurog"
+    if (detectar(['vejiga\\s*neurogenica', 'v[ej]j?\\s*neurog\\w*', 'veg\\s*neurog\\w*', 'vej\\s*neurog\\w*', 'vejiga\\s*neuropatica', 'disfuncion\\s*vesical\\s*neurogenica'])) out['vejiga-neurogenica'] = true;
+
+    // HPB - Hiperplasia Prostática Benigna: aceptar sigla en mayús o minús, formas largas, y "prostatismo"
+    if (detectar(['\\bhpb\\b', 'hiperplasia\\s*prostatica', 'hiperplasia\\s*prostatica\\s*benigna', 'hiperplasia\\s*(?:de|del)\\s*prostata', 'hipertrofia\\s*prostatica', 'crecimiento\\s*prostatico', 'adenoma\\s*prostatico', 'adenoma\\s*de\\s*prostata', 'prostatismo'])) out.hpb = true;
 
     // ─── EXAMEN FÍSICO ───
     const tas = extraerNumero(['ta\\s*sistolica', 'tas', 'presion\\s*sistolica'], { min: 50, max: 300, entero: true });
@@ -1564,6 +1574,12 @@ function autocargaDesdeTextoLibre() {
     // Albuminuria: Alb/24hs, alb u, microalbuminuria, cociente A/C, ualb
     const alb = extraerNumero(['albuminuria', 'microalbuminuria', '\\bmau\\b', 'rac', 'cociente\\s*(?:de\\s*)?albumina[\\s\\/\\-]+creatinina', 'cociente\\s*a\\s*\\/\\s*c', 'cociente\\s*alb\\s*\\/\\s*crea', 'alb\\s*\\/\\s*crea', 'alb\\s*\\/?\\s*24\\s*h?s?', 'alb\\s*u', 'ualb'], { min: 0 });
     if (alb) out.albuminuria = alb;
+
+    // Albúmina plasmática (g/dL): valor típico 1.5–5.5. Distinto de Albuminuria (mg/24h, valores altos).
+    // Patrones para "albúmina", "albumina", "alb plasmatica", "alb sérica", "alb 4", "alb: 3.8".
+    // Usamos (?!u) para que "alb" no matchee con "albu...minuria".
+    const albp = extraerNumero(['albumina\\s*plasmatica', 'albumina\\s*serica', 'albumina\\s*en\\s*sangre', 'albuminemia', 'albumina(?!\\s*\\/?\\s*24)(?!\\s*u\\b)(?!\\s*\\/\\s*crea)', 'alb\\s*plasmatica', 'alb\\s*serica', 'alb(?!u)\\b'], { min: 0.5, max: 7.0 });
+    if (albp) out.albumina = albp;
 
     // Hb: Hemoglobina, hgb, hb
     const hb = extraerNumero(['hemoglobina(?!\\s*glic)', 'hgb', 'hb(?!1ac|a1c)'], { min: 0 });
@@ -1720,6 +1736,42 @@ function autocargaDesdeTextoLibre() {
     if (detectar(['obito', 'fallecio', 'fallec[ei]', 'muerte\\s*del\\s*paciente'])) out.obito = 'Sí';
     if (detectar(['infecci[oó]n(?:es)?\\w*', 'infeccios[oa]', 'sepsis', 'sept[iu]co', 'bacteriemia', 'bacteremia', 'itu', 'ivu', 'neumoni[ae]', 'endocarditis', 'bronquitis', 'pie\\s*diabetico', 'ippb', 'infeccion\\s*de\\s*piel\\s*(?:y\\s*partes\\s*blandas)?', 'absceso[s]?', 'abceso[s]?', 'celulitis', 'faringitis', 'gastroenteritis', 'meningitis', 'osteomielitis', 'colecistitis', 'prostatitis', 'pielonefritis', 'infeccion\\s*asociada\\s*a\\s*cateter'])) out.infeccion = 'Sí';
 
+    // Si hay infección, intentar capturar QUÉ tipo (para el campo "Infección Cuál")
+    if (out.infeccion === 'Sí') {
+      const tiposInf = [
+        ['neumonia', 'Neumonía'],
+        ['sepsis\\s*a?\\s*foco\\s*respiratorio', 'Sepsis a foco respiratorio'],
+        ['sepsis\\s*a?\\s*foco\\s*urinario', 'Sepsis a foco urinario'],
+        ['sepsis\\s*a?\\s*foco\\s*abdominal', 'Sepsis a foco abdominal'],
+        ['sepsis\\s*a?\\s*foco\\s*cutaneo', 'Sepsis a foco cutáneo'],
+        ['sepsis', 'Sepsis'],
+        ['pielonefritis', 'Pielonefritis'],
+        ['itu', 'ITU'],
+        ['ivu', 'ITU'],
+        ['celulitis', 'Celulitis'],
+        ['endocarditis', 'Endocarditis'],
+        ['meningitis', 'Meningitis'],
+        ['osteomielitis', 'Osteomielitis'],
+        ['colecistitis', 'Colecistitis'],
+        ['prostatitis', 'Prostatitis'],
+        ['gastroenteritis', 'Gastroenteritis'],
+        ['bronquitis', 'Bronquitis'],
+        ['faringitis', 'Faringitis'],
+        ['absceso', 'Absceso'],
+        ['ippb', 'Infección de piel y partes blandas'],
+        ['infeccion\\s*de\\s*piel', 'Infección de piel y partes blandas'],
+        ['pie\\s*diabetico', 'Pie diabético infectado'],
+        ['bacteriemia', 'Bacteriemia'],
+        ['infeccion\\s*asociada\\s*a\\s*cateter', 'Infección asociada a catéter']
+      ];
+      const encontradas = [];
+      for (const [pat, etiqueta] of tiposInf) {
+        const re = new RegExp('\\b' + pat + '\\b', 'i');
+        if (re.test(norm) && encontradas.indexOf(etiqueta) === -1) encontradas.push(etiqueta);
+      }
+      if (encontradas.length > 0) out['infeccion-cual'] = encontradas.slice(0, 3).join(' / ');
+    }
+
     // ═══════════════════════════════════════════════════════════
     // MEDICACIÓN — sinónimos del documento Word
     // ═══════════════════════════════════════════════════════════
@@ -1731,8 +1783,9 @@ function autocargaDesdeTextoLibre() {
     // BB
     if (detectar(['betabloqueante', 'bisoprolol', 'carvedilol', 'atenolol', 'nebivolol', 'metoprolol', 'propranolol'])) out.bb = true;
 
-    // iSGLT2: iSGLT2, gliflozinas, Dapagliflozina, Empagliflozina, Canagliflozina, Forxiga, Jardiance
-    if (detectar(['isglt2', 'sglt2', 'gliflozinas?', 'dapagliflozina', 'empagliflozina', 'canagliflozina', 'ertugliflozina', 'dapa', 'empa', 'forxiga', 'jardiance'])) out.isglt2 = true;
+    // iSGLT2: iSGLT2, gliflozinas, Dapagliflozina (o dapaglifozina con typo común), Empagliflozina, Canagliflozina, Forxiga, Jardiance, Invokana, Steglatro
+    // En "fl?o" la "l" es opcional para tolerar el typo común "dapaglifozina" (sin la l de flo)
+    if (detectar(['isglt2', 'sglt-?2', 'sglt\\s*2', 'glifl?ozinas?', 'dapaglifl?ozina', 'empaglifl?ozina', 'canaglifl?ozina', 'ertuglifl?ozina', 'dapa', 'empa', 'cana', 'ertu', 'forxiga', 'jardiance', 'invokana', 'steglatro', 'xigduo', 'glyxambi'])) out.isglt2 = true;
 
     // MRA: Antagonistas mineralocorticoide, Espironolactona, Eplerenona, Finerenona
     if (detectar(['\\bmra\\b', 'antagonistas?\\s*mineralocorticoide[s]?', 'antimineralocorticoide', 'espironolactona', 'eplerenona', 'finerenona', 'espiro'])) out.mra = true;
@@ -1766,7 +1819,7 @@ function autocargaDesdeTextoLibre() {
     const MEDS_CONOCIDAS = [
       'enalapril','lisinopril','losartan','valsartan','candesartan','telmisartan','olmesartan','irbesartan','ieca','ara',
       'bisoprolol','carvedilol','atenolol','nebivolol','metoprolol','propranolol','betabloqueante',
-      'dapa','empa','dapagliflozina','empagliflozina','canagliflozina','ertugliflozina','isglt2','sglt2','gliflozinas','forxiga','jardiance',
+      'dapa','empa','cana','ertu','dapagliflozina','empagliflozina','canagliflozina','ertugliflozina','dapaglifozina','empaglifozina','canaglifozina','ertuglifozina','isglt2','sglt2','gliflozinas','glifozinas','forxiga','jardiance','invokana','steglatro','xigduo','glyxambi',
       'espironolactona','eplerenona','finerenona','espiro',
       'atorvastatina','rosuvastatina','simvastatina','pravastatina','atorva','estatinas','estatina','hipolipemiante',
       'furosemida','hidroclorotiazida','torasemida','tiazida','tiazidas','diureticos','diuretico','hctz','indapamida',
