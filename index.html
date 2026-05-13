@@ -1949,7 +1949,79 @@ function autocargaDesdeTextoLibre() {
       if (fecha) out['fecha-dialisis'] = fecha;
     }
 
-    if (detectar(['internaci[oó]n', 'hospitalizaci[oó]n', 'internad[oa]'])) out.internacion = 'Sí';
+    // ─── INTERNACIÓN ───
+    // Detección amplia: cubre sustantivo (internación, hospitalización), participio
+    // (internado/a, hospitalizado/a), reflexivo en pretérito ("se internó", "se interno"),
+    // formas en pretérito sin "se" ("internó", "ingresó"), y variantes con "ingreso" 
+    // (sustantivo y verbo). Sin tildes porque el parser normaliza antes.
+    // Defensa contra ReDoS: todos los patrones tienen cuantificadores acotados y sin backtracking ambiguo.
+    const PATRONES_INTERNACION = [
+      'internaci[oó]n',                // internación / internacion
+      'hospitalizaci[oó]n',            // hospitalización / hospitalizacion
+      'internad[oa]s?',                // internado / internada / internados / internadas
+      'hospitalizad[oa]s?',            // hospitalizado/a/os/as
+      'se\\s+intern[oó]',              // "se internó", "se interno"
+      'se\\s+hospitaliz[oó]',          // "se hospitalizó", "se hospitalizo"
+      'intern[oó](?!gr)',              // "internó", "interno" (excluye "internograma" y similares)
+      'hospitaliz[oó]',                // "hospitalizó", "hospitalizo"
+      'fue\\s+internad[oa]',           // "fue internado/a"
+      'fue\\s+hospitalizad[oa]',       // "fue hospitalizado/a"
+      'ingres[oó]\\s+(?:al?\\s+)?(?:hospital|clinica|sanatorio|institucion|sala|piso|cuidados?)',  // "ingresó al hospital", "ingreso a sala"
+      'ingreso\\s+(?:al?\\s+)?(?:hospital|clinica|sanatorio|institucion|sala|piso)',  // "ingreso al hospital"
+      'requiri[oó]\\s+internaci[oó]n',  // "requirió internación"
+      'requiri[oó]\\s+hospitalizaci[oó]n'
+    ];
+    const reIntAny = new RegExp('\\b(' + PATRONES_INTERNACION.join('|') + ')\\b', 'gi');
+    let intIdx = -1;
+    let intLen = 0;
+    let mIntMatch;
+    while ((mIntMatch = reIntAny.exec(norm)) !== null) {
+      if (!esNegado(norm, mIntMatch.index)) {
+        intIdx = mIntMatch.index;
+        intLen = mIntMatch[0].length;
+        out.internacion = 'Sí';
+        break;
+      }
+    }
+
+    // Fecha de internación: ventana asimétrica hacia adelante (200 chars).
+    // No miramos hacia atrás para evitar capturar fechas de otros eventos previos
+    // (laboratorio, AKI, diálisis).
+    if (intIdx !== -1) {
+      const mesesInt = { enero:1, febrero:2, marzo:3, abril:4, mayo:5, junio:6, julio:7, agosto:8, septiembre:9, setiembre:9, octubre:10, noviembre:11, diciembre:12 };
+      const desde = intIdx;
+      const hasta = Math.min(norm.length, intIdx + intLen + 200);
+      const ventanaNorm = norm.substring(desde, hasta);
+      let fechaInt = null;
+      // Formato numérico D/M/YY o DD/MM/YYYY
+      const reFechaNum = /(?:^|[^\d])(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})(?!\d)/;
+      const mFn = ventanaNorm.match(reFechaNum);
+      if (mFn) {
+        let dia = parseInt(mFn[1]);
+        let mo = parseInt(mFn[2]);
+        let y = parseInt(mFn[3]);
+        if (dia >= 1 && dia <= 31 && mo >= 1 && mo <= 12) {
+          if (y < 100) y += 2000;
+          if (y >= 1990 && y <= 2100) {
+            fechaInt = y + '-' + String(mo).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
+          }
+        }
+      }
+      // Formato texto "4 de abril de 2026"
+      if (!fechaInt) {
+        const reFechaTxt = /\b(\d{1,2})\s+de\s+([a-zñ]+)(?:\s+(?:de|del)\s+)?(\d{4})?\b/i;
+        const mFt = ventanaNorm.match(reFechaTxt);
+        if (mFt) {
+          const dia = parseInt(mFt[1]);
+          const mo = mesesInt[mFt[2].toLowerCase()];
+          const y = mFt[3] ? parseInt(mFt[3]) : new Date().getFullYear();
+          if (mo && dia >= 1 && dia <= 31 && y >= 1990 && y <= 2100) {
+            fechaInt = y + '-' + String(mo).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
+          }
+        }
+      }
+      if (fechaInt) out['fecha-internacion'] = fechaInt;
+    }
 
     (function() {
       if (/\bmace\s*[:=]/i.test(norm) || /\bevento\s*cardiovascular\s*mayor\b/i.test(norm)) {
